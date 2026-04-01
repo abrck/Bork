@@ -11,8 +11,10 @@ namespace Offsets
     inline uintptr_t GameViewport                = 0x808;
     inline uintptr_t World                       = 0x70;
     inline uintptr_t TinyFont                    = 0x30;
+    inline uintptr_t LegacyFontSize              = 0x134;
     inline uintptr_t SizeX                       = 0x40;
     inline uintptr_t SizeY                       = 0x44;
+    inline uintptr_t Mesh                        = 0x340;
 }
 
 #endif /* OFFSETS_H */

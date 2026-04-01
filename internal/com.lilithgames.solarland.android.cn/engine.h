@@ -5,8 +5,14 @@
 
 namespace GameData
 {
-    inline uintptr_t GEngine = 0;
+    inline UEngine *GEngine = 0;
     inline uintptr_t GameViewport = 0;
+
+    inline UWorld* World = nullptr;
+
+    inline ASolarPlayerController *MyController = nullptr;
+    inline ASolarCharacter *MyPawn = nullptr;
+    inline APlayerCameraManager *MyCameraManager = nullptr;
 
 } // namespace GameData
 

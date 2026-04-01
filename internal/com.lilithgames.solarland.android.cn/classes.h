@@ -35,29 +35,53 @@ class AActor : public UObject
 public:
 };
 
-class AController : public AActor
+class APlayerState : public AActor
+{
+public:
+	// Object: Function Engine.PlayerState.GetPlayerName
+	// Flags: [Final|Native|Public|BlueprintCallable|BlueprintPure|Const]
+	FString GetPlayerName()
+    {
+        static UObject *Func = nullptr;
+        if (!Func)
+            Func = UObject::StaticFindObject(u"/Script/Engine.PlayerState:GetPlayerName");
+
+        struct
+        {
+            FString ReturnValue;
+        } Params;
+
+        ProcessEvent(Func, &Params);
+
+        return Params.ReturnValue;
+    }
+};
+
+class AModularPlayerState : public APlayerState
 {
 public:
 };
 
-class APlayerController : public AController
+class ASolarPlayerState : public AModularPlayerState
 {
 public:
-};
+    // Object: Function Solarland.SolarPlayerState.IsAIPlayer
+    // Flags: [Native|Public|BlueprintCallable|BlueprintPure|Const]
+    bool IsAIPlayer()
+    {
+        static UObject *Func = nullptr;
+        if (!Func)
+            Func = UObject::StaticFindObject(u"/Script/Solarland.SolarPlayerState:IsAIPlayer");
 
-class AModularPlayerController : public APlayerController
-{
-public:
-};
+        struct
+        {
+            bool ReturnValue;
+        } Params;
 
-class ASolarPlayerControllerBase : public AModularPlayerController
-{
-public:
-};
+        ProcessEvent(Func, &Params);
 
-class ASolarPlayerController : public ASolarPlayerControllerBase
-{
-public:
+        return Params.ReturnValue;
+    }
 };
 
 class APawn : public AActor
@@ -78,11 +102,47 @@ public:
 class ASolarCharacterBase : public AModularCharacter
 {
 public:
+	// Object: Function Solarland.SolarCharacterBase.K2_IsAlive
+	// Flags: [Final|Native|Public|BlueprintCallable|BlueprintPure|Const]
+	bool K2_IsAlive()
+    {
+        static UObject *Func = nullptr;
+        if (!Func)
+            Func = UObject::StaticFindObject(u"/Script/Solarland.SolarCharacterBase:K2_IsAlive");
+
+        struct
+        {
+            bool ReturnValue;
+        } Params;
+
+        ProcessEvent(Func, &Params);
+
+        return Params.ReturnValue;
+    }
+
 };
 
 class ASolarCharacter : public ASolarCharacterBase
 {
 public:
+	// Object: Function Solarland.SolarCharacter.GetSolarPlayerState
+	// Flags: [Final|RequiredAPI|Native|Public|BlueprintCallable|BlueprintPure|Const]
+	ASolarPlayerState* GetSolarPlayerState()
+    {
+        static UObject *Func = nullptr;
+        if (!Func)
+            Func = UObject::StaticFindObject(u"/Script/Solarland.SolarCharacter:GetSolarPlayerState");
+
+        struct
+        {
+            ASolarPlayerState* ReturnValue;
+        } Params;
+
+        ProcessEvent(Func, &Params);
+
+        return Params.ReturnValue;
+    }
+
     static UObject *StaticClass()
     {
         static UObject *Clazz = nullptr;
@@ -90,6 +150,153 @@ public:
             Clazz = StaticFindObject(u"/Script/Solarland.SolarCharacter");
         return Clazz;
     }
+};
+
+class AController : public AActor
+{
+public:
+    // Object: Function Engine.Controller.K2_GetPawn
+    // Flags: [Final|Native|Public|BlueprintCallable|BlueprintPure|Const]
+    APawn *K2_GetPawn()
+    {
+        static UObject *Func = nullptr;
+        if (!Func)
+            Func = UObject::StaticFindObject(u"/Script/Engine.Controller:K2_GetPawn");
+
+        struct
+        {
+            APawn *ReturnValue;
+        } Params = {};
+
+        ProcessEvent(Func, &Params);
+
+        return Params.ReturnValue;
+    }
+};
+
+class APlayerController : public AController
+{
+public:
+	// Object: Function Engine.PlayerController.ProjectWorldLocationToScreen
+	// Flags: [Final|Native|Public|HasOutParms|HasDefaults|BlueprintCallable|BlueprintPure|Const]
+    bool ProjectWorldLocationToScreen(FVector WorldLocation, FVector2D& ScreenLocation, bool bPlayerViewportRelative)
+    {
+        static UObject* Func = nullptr;
+        if (!Func)
+            Func = UObject::StaticFindObject(u"/Script/Engine.PlayerController:ProjectWorldLocationToScreen");
+
+        struct
+        {
+            FVector WorldLocation;
+            FVector2D ScreenLocation;
+            bool bPlayerViewportRelative;
+            bool ReturnValue;
+        } Params = {WorldLocation, {}, bPlayerViewportRelative};
+
+        ProcessEvent(Func, &Params);
+
+        ScreenLocation.X = Params.ScreenLocation.X;
+        ScreenLocation.Y = Params.ScreenLocation.Y;
+
+        return Params.ReturnValue;
+    }
+};
+
+class APlayerCameraManager : public AActor
+{
+public:
+};
+
+class AModularPlayerController : public APlayerController
+{
+public:
+};
+
+class ASolarPlayerControllerBase : public AModularPlayerController
+{
+public:
+};
+
+class ASolarPlayerController : public ASolarPlayerControllerBase
+{
+public:
+};
+
+class UActorComponent : public UObject
+{
+public:
+};
+
+class USceneComponent : public UActorComponent
+{
+public:
+	// Object: Function Engine.SceneComponent.GetAllSocketNames
+	// Flags: [Final|Native|Public|BlueprintCallable|BlueprintPure|Const]
+	TArray<FName> GetAllSocketNames()
+    {
+        static UObject *Func = nullptr;
+        if (!Func)
+            Func = UObject::StaticFindObject(u"/Script/Engine.SceneComponent:GetAllSocketNames");
+
+        struct
+        {
+            TArray<FName> ReturnValue;
+        } Params;
+
+        ProcessEvent(Func, &Params);
+
+        return Params.ReturnValue;
+    }
+
+};
+
+class UPrimitiveComponent : public USceneComponent
+{
+public:
+};
+
+class UMeshComponent : public UPrimitiveComponent
+{
+public:
+};
+
+class USkinnedMeshComponent : public UMeshComponent
+{
+public:
+	// Object: Function Engine.SkinnedMeshComponent.TransformFromBoneSpace
+	// Flags: [Final|Native|Public|HasOutParms|HasDefaults|BlueprintCallable]
+    void TransformFromBoneSpace(FName BoneName, const FVector& InPosition, const FRotator& InRotation, FVector& OutPosition, FRotator& OutRotation)
+    {
+        static UObject* Func = nullptr;
+        if (!Func)
+            Func = UObject::StaticFindObject(u"/Script/Engine.SkinnedMeshComponent:TransformFromBoneSpace");
+        
+        struct
+        {
+            FName BoneName;
+            FVector InPosition;
+            FRotator InRotation;
+            FVector OutPosition;
+            FRotator OutRotation;
+        } Params = {BoneName, InPosition, InRotation, {}, {}};
+        
+        ProcessEvent(Func, &Params);
+
+        OutPosition = Params.OutPosition;
+        OutRotation = Params.OutRotation;
+    }
+
+    FVector GetBoneLocation(FName BoneName)
+    {
+        FVector OutPos; FRotator OutRot;
+        TransformFromBoneSpace(BoneName, FVector(), FRotator(), OutPos, OutRot);
+        return OutPos;
+    }
+};
+
+class USkeletalMeshComponent : public USkinnedMeshComponent
+{
+public:
 };
 
 class UWorld : public UObject
@@ -100,6 +307,15 @@ public:
 class UFont : public UObject
 {
 public:
+    void SetFontSize(int32_t Size)
+    {
+        *reinterpret_cast<int32_t *>((uintptr_t)this + Offsets::LegacyFontSize) = Size;
+    }
+
+    int32_t GetFontSize()
+    {
+        return *reinterpret_cast<int32_t *>((uintptr_t)this + Offsets::LegacyFontSize);
+    }
 };
 
 class UEngine : public UObject
@@ -116,7 +332,7 @@ class UCanvas : public UObject
 public:
     FVector2D GetSize()
     {
-        return FVector2D(*(float*)((uintptr_t)this + Offsets::SizeX), *(float*)((uintptr_t)this + Offsets::SizeY));
+        return FVector2D(*(int*)((uintptr_t)this + Offsets::SizeX), *(int*)((uintptr_t)this + Offsets::SizeY));
     }
 
 	// Object: Function Engine.Canvas.K2_DrawText
@@ -165,11 +381,87 @@ public:
         ProcessEvent(Func, &Params);
     }
 
+    void K2_DrawText(UFont* RenderFont, int RenderFontSize, FString RenderText, FVector2D ScreenPosition, FLinearColor RenderColor, bool bCentreX, bool bCentreY, bool bOutlined, FLinearColor OutlineColor)
+    {
+        int OrigFontSize = RenderFont->GetFontSize();
+        RenderFont->SetFontSize(RenderFontSize);
+        K2_DrawText(RenderFont, RenderText, ScreenPosition, FVector2D(1.0f, 1.0f), RenderColor, 1.0f, FLinearColor(0.0f, 0.0f, 0.0f, 1.0f), FVector2D(0.0f, 0.0f), bCentreX, bCentreY, bOutlined, OutlineColor);
+        RenderFont->SetFontSize(OrigFontSize);
+    }
 };
 
 class UBlueprintFunctionLibrary : public UObject
 {
 public:
+};
+
+class UKismetStringLibrary : public UBlueprintFunctionLibrary
+{
+public:
+	// Object: Function Engine.KismetStringLibrary.Conv_StringToName
+	// Flags: [Final|Native|Static|Public|BlueprintCallable|BlueprintPure]
+	static FName Conv_StringToName(FString InString)
+    {
+        static UObject *Func = nullptr;
+        if (!Func)
+            Func = UObject::StaticFindObject(u"/Script/Engine.KismetStringLibrary:Conv_StringToName");
+
+        struct
+        {
+            FString InString;
+            FName ReturnValue;
+        } Params = {InString};
+
+        GetDefaultObj()->ProcessEvent(Func, &Params);
+
+        return Params.ReturnValue;
+    }
+
+	// Object: Function Engine.KismetStringLibrary.Conv_ObjectToString
+	// Flags: [Final|Native|Static|Public|BlueprintCallable|BlueprintPure]
+	static FString Conv_ObjectToString(UObject* InObj)
+    {
+        static UObject *Func = nullptr;
+        if (!Func)
+            Func = UObject::StaticFindObject(u"/Script/Engine.KismetStringLibrary:Conv_ObjectToString");
+
+        struct
+        {
+            UObject* InObj;
+            FString ReturnValue;
+        } Params = {InObj};
+
+        GetDefaultObj()->ProcessEvent(Func, &Params);
+
+        return Params.ReturnValue;
+    }
+
+	// Object: Function Engine.KismetStringLibrary.Conv_NameToString
+	// Flags: [Final|Native|Static|Public|BlueprintCallable|BlueprintPure]
+	static FString Conv_NameToString(FName InName)
+    {
+        static UObject *Func = nullptr;
+        if (!Func)
+            Func = UObject::StaticFindObject(u"/Script/Engine.KismetStringLibrary:Conv_NameToString");
+
+        struct
+        {
+            FName InName;
+            FString ReturnValue;
+        } Params = {InName};
+
+        GetDefaultObj()->ProcessEvent(Func, &Params);
+
+        return Params.ReturnValue;
+    }
+
+    static UKismetStringLibrary *GetDefaultObj()
+    {
+        static UObject *Obj = nullptr;
+        if (!Obj)
+            Obj = UObject::StaticFindObject(u"/Script/Engine.Default__KismetStringLibrary");
+        return reinterpret_cast<UKismetStringLibrary *>(Obj);
+    }
 };
 
 class UKismetSystemLibrary : public UBlueprintFunctionLibrary
@@ -254,6 +546,26 @@ public:
             int32_t PlayerIndex;
             APlayerController *ReturnValue;
         } Params = {WorldContextObject, PlayerIndex};
+
+        GetDefaultObj()->ProcessEvent(Func, &Params);
+
+        return Params.ReturnValue;
+    }
+
+	// Object: Function Engine.GameplayStatics.GetPlayerCameraManager
+	// Flags: [Final|Native|Static|Public|BlueprintCallable|BlueprintPure]
+	static APlayerCameraManager* GetPlayerCameraManager(UObject* WorldContextObject, int32_t PlayerIndex)
+    {
+        static UObject* Func = nullptr;
+        if (!Func)
+            Func = UObject::StaticFindObject(u"/Script/Engine.GameplayStatics:GetPlayerCameraManager");
+
+        struct
+        {
+            UObject* WorldContextObject;
+            int32_t PlayerIndex;
+            APlayerCameraManager* ReturnValue;
+        } Params = {WorldContextObject, PlayerIndex, nullptr};
 
         GetDefaultObj()->ProcessEvent(Func, &Params);
 
