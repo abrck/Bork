@@ -123,6 +123,16 @@ public:
     }
 };
 
+class ASolarWeapon : public AActor
+{
+public:
+};
+
+class ASolarPlayerWeapon : public ASolarWeapon
+{
+public:
+};
+
 class APawn : public AActor
 {
 public:
@@ -163,6 +173,43 @@ public:
 class ASolarCharacter : public ASolarCharacterBase
 {
 public:
+	// Object: Function Solarland.SolarCharacter.IsFiring
+	// Flags: [Final|RequiredAPI|Native|Public|BlueprintCallable|BlueprintPure|Const]
+
+	bool IsFiring()
+    {
+        static UObject *Func = nullptr;
+        if (!Func)
+            Func = StaticFindObject(u"/Script/Solarland.SolarCharacter:IsFiring");
+
+        struct
+        {
+            bool ReturnValue;
+        } Params;
+
+        ProcessEvent(Func, &Params);
+
+        return Params.ReturnValue;
+    }
+
+	// Object: Function Solarland.SolarCharacter.IsAiming
+	// Flags: [Final|Native|Public|BlueprintCallable|BlueprintPure|Const]
+	bool IsAiming()
+    {
+        static UObject *Func = nullptr;
+        if (!Func)
+            Func = StaticFindObject(u"/Script/Solarland.SolarCharacter:IsAiming");
+
+        struct
+        {
+            bool ReturnValue;
+        } Params;
+
+        ProcessEvent(Func, &Params);
+
+        return Params.ReturnValue;
+    }
+
     // Object: Function Solarland.SolarCharacter.GetSolarPlayerState
     // Flags: [Final|RequiredAPI|Native|Public|BlueprintCallable|BlueprintPure|Const]
     ASolarPlayerState *GetSolarPlayerState()
@@ -180,6 +227,25 @@ public:
 
         return Params.ReturnValue;
     }
+
+	// Object: Function Solarland.SolarCharacter.GetCurrentWeapon
+	// Flags: [Final|Native|Public|BlueprintCallable|BlueprintPure|Const]
+	ASolarPlayerWeapon* GetCurrentWeapon()
+    {
+        static UObject *Func = nullptr;
+        if (!Func)
+            Func = StaticFindObject(u"/Script/Solarland.SolarCharacter:GetCurrentWeapon");
+
+        struct
+        {
+            ASolarPlayerWeapon *ReturnValue;
+        } Params;
+
+        ProcessEvent(Func, &Params);
+
+        return Params.ReturnValue;
+    }
+
 
     static UObject *StaticClass()
     {
@@ -236,6 +302,38 @@ public:
 class APlayerController : public AController
 {
 public:
+	// Object: Function Engine.PlayerController.AddYawInput
+	// Flags: [Native|Public|BlueprintCallable]
+	void AddYawInput(float Val)
+    {
+        static UObject *Func = nullptr;
+        if (!Func)
+            Func = UObject::StaticFindObject(u"/Script/Engine.PlayerController:AddYawInput");
+
+        struct
+        {
+            float Val;
+        } Params = {Val};
+
+        ProcessEvent(Func, &Params);
+    }
+
+	// Object: Function Engine.PlayerController.AddPitchInput
+	// Flags: [Native|Public|BlueprintCallable]
+	void AddPitchInput(float Val)
+    {
+        static UObject *Func = nullptr;
+        if (!Func)
+            Func = UObject::StaticFindObject(u"/Script/Engine.PlayerController:AddPitchInput");
+
+        struct
+        {
+            float Val;
+        } Params = {Val};
+
+        ProcessEvent(Func, &Params);
+    }
+
     // Object: Function Engine.PlayerController.ProjectWorldLocationToScreen
     // Flags: [Final|Native|Public|HasOutParms|HasDefaults|BlueprintCallable|BlueprintPure|Const]
     bool ProjectWorldLocationToScreen(FVector WorldLocation, FVector2D &ScreenLocation)
@@ -264,6 +362,42 @@ public:
 class APlayerCameraManager : public AActor
 {
 public:
+	// Object: Function Engine.PlayerCameraManager.GetCameraRotation
+	// Flags: [Native|Public|HasDefaults|BlueprintCallable|BlueprintPure|Const]
+	FRotator GetCameraRotation()
+    {
+        static UObject *Func = nullptr;
+        if (!Func)
+            Func = StaticFindObject(u"/Script/Engine.PlayerCameraManager:GetCameraRotation");
+
+        struct
+        {
+            FRotator ReturnValue;
+        } Params;
+
+        ProcessEvent(Func, &Params);
+
+        return Params.ReturnValue;
+    }
+
+	// Object: Function Engine.PlayerCameraManager.GetCameraLocation
+	// Flags: [Native|Public|HasDefaults|BlueprintCallable|BlueprintPure|Const]
+	FVector GetCameraLocation()
+    {
+        static UObject *Func = nullptr;
+        if (!Func)
+            Func = StaticFindObject(u"/Script/Engine.PlayerCameraManager:GetCameraLocation");
+
+        struct
+        {
+            FVector ReturnValue;
+        } Params;
+
+        ProcessEvent(Func, &Params);
+
+        return Params.ReturnValue;
+    }
+
 };
 
 class AModularPlayerController : public APlayerController
@@ -442,41 +576,47 @@ public:
         return result;
     }
 
-    bool GetBoxCoords(ASolarPlayerController *MyController, FVector2D *Coords)
+    bool GetBoxCoords(FVector* OutBoxMin, FVector* OutBoxMax)
     {
-        BoneIndex *BoneIdx = GetBoneIndex();
-        int32_t BoneList[] = {BoneIdx->head, BoneIdx->neck_01, BoneIdx->spine_03, BoneIdx->spine_02, BoneIdx->spine_01, BoneIdx->pelvis, BoneIdx->hand_l, BoneIdx->lowerarm_l, BoneIdx->upperarm_l, BoneIdx->clavicle_l, BoneIdx->hand_r, BoneIdx->lowerarm_r, BoneIdx->upperarm_r, BoneIdx->clavicle_r, BoneIdx->ball_l, BoneIdx->foot_l, BoneIdx->calf_l, BoneIdx->thigh_l, BoneIdx->ball_r, BoneIdx->foot_r, BoneIdx->calf_r, BoneIdx->thigh_r};
-        
-        float MinX = FLT_MAX, MinY = FLT_MAX;
-        float MaxX = -FLT_MAX, MaxY = -FLT_MAX;
-        
+        BoneIndex* BoneIdx = GetBoneIndex();
+        if (!BoneIdx) return false;
+
+        int32_t BoneList[] = {
+            BoneIdx->head, BoneIdx->neck_01, BoneIdx->spine_03, BoneIdx->spine_02, BoneIdx->spine_01, BoneIdx->pelvis,
+            BoneIdx->hand_l, BoneIdx->lowerarm_l, BoneIdx->upperarm_l, BoneIdx->clavicle_l,
+            BoneIdx->hand_r, BoneIdx->lowerarm_r, BoneIdx->upperarm_r, BoneIdx->clavicle_r,
+            BoneIdx->ball_l, BoneIdx->foot_l, BoneIdx->calf_l, BoneIdx->thigh_l,
+            BoneIdx->ball_r, BoneIdx->foot_r, BoneIdx->calf_r, BoneIdx->thigh_r
+        };
+
+        FVector Min(FLT_MAX, FLT_MAX, FLT_MAX);
+        FVector Max(-FLT_MAX, -FLT_MAX, -FLT_MAX);
+
         bool Found = false;
-        for (int i = 0; i < sizeof(BoneList) / sizeof(int32_t); i++)
+        int BoneCount = sizeof(BoneList) / sizeof(int32_t);
+
+        for (int i = 0; i < BoneCount; ++i)
         {
             int Bone = BoneList[i];
             if (Bone <= 0)
                 continue;
-            FVector2D Screen;
-            if (!MyController->ProjectWorldLocationToScreen(GetBoneLocation(Bone), Screen))
-                continue;
+            FVector Loc = GetBoneLocation(Bone);
             Found = true;
-            if (Screen.X < MinX)
-                MinX = Screen.X;
-            if (Screen.X > MaxX)
-                MaxX = Screen.X;
-            if (Screen.Y < MinY)
-                MinY = Screen.Y;
-            if (Screen.Y > MaxY)
-                MaxY = Screen.Y;
+            Min.X = std::min(Min.X, Loc.X);
+            Min.Y = std::min(Min.Y, Loc.Y);
+            Min.Z = std::min(Min.Z, Loc.Z);
+
+            Max.X = std::max(Max.X, Loc.X);
+            Max.Y = std::max(Max.Y, Loc.Y);
+            Max.Z = std::max(Max.Z, Loc.Z);
         }
         if (!Found)
             return false;
-        float PaddingX = (MaxX - MinX) * 0.1f;
-        float PaddingY = (MaxY - MinY) * 0.1f;
-        Coords[0].X = MinX - PaddingX;
-        Coords[0].Y = MinY - PaddingY;
-        Coords[1].X = MaxX + PaddingX;
-        Coords[1].Y = MaxY + PaddingY;
+
+        FVector Padding((Max.X - Min.X) * 0.1f, (Max.Y - Min.Y) * 0.1f, (Max.Z - Min.Z) * 0.1f);
+
+        *OutBoxMin = Min - Padding;
+        *OutBoxMax = Max + Padding;
         return true;
     }
 };
@@ -574,6 +714,30 @@ public:
         RenderFont->SetFontSize(RenderFontSize);
         K2_DrawText(RenderFont, RenderText, ScreenPosition, FVector2D(1.0f, 1.0f), RenderColor, 1.0f, FLinearColor(0.0f, 0.0f, 0.0f, 1.0f), FVector2D(0.0f, 0.0f), bCentreX, bCentreY, bOutlined, OutlineColor);
         RenderFont->SetFontSize(OrigFontSize);
+    }
+
+    void K2_DrawCircle(FVector2D Center, float Radius, float Thickness, FLinearColor Color, int Segments = 32)
+    {
+        if (Segments < 3) Segments = 3;
+        
+        float AngleStep = 2.0f * 3.14159265f / Segments;
+        
+        float StartX = Center.X + Radius;
+        float StartY = Center.Y;
+        float PrevX = StartX;
+        float PrevY = StartY;
+        
+        for (int i = 1; i <= Segments; i++)
+        {
+            float Angle = AngleStep * i;
+            float CurX = Center.X + Radius * cos(Angle);
+            float CurY = Center.Y + Radius * sin(Angle);
+            
+            K2_DrawLine(FVector2D(PrevX, PrevY), FVector2D(CurX, CurY), Thickness, Color);
+            
+            PrevX = CurX;
+            PrevY = CurY;
+        }
     }
 };
 
@@ -715,6 +879,38 @@ public:
         if (!Obj)
             Obj = UObject::StaticFindObject(u"/Script/Engine.Default__KismetSystemLibrary");
         return reinterpret_cast<UKismetSystemLibrary *>(Obj);
+    }
+};
+
+class UKismetMathLibrary : public UBlueprintFunctionLibrary
+{
+public:
+	// Object: Function Engine.KismetMathLibrary.FindLookAtRotation
+	// Flags: [Final|Native|Static|Public|HasOutParms|HasDefaults|BlueprintCallable|BlueprintPure]
+	static FRotator FindLookAtRotation(FVector& Start, FVector& Target)
+    {
+        static UObject *Func = nullptr;
+        if (!Func)
+            Func = UObject::StaticFindObject(u"/Script/Engine.KismetMathLibrary:FindLookAtRotation");
+
+        struct
+        {
+            FVector Start;
+            FVector Target;
+            FRotator ReturnValue;
+        } Params = {Start, Target};
+
+        GetDefaultObj()->ProcessEvent(Func, &Params);
+
+        return Params.ReturnValue;
+    }
+
+    static UKismetMathLibrary *GetDefaultObj()
+    {
+        static UObject *Obj = nullptr;
+        if (!Obj)
+            Obj = UObject::StaticFindObject(u"/Script/Engine.Default__KismetMathLibrary");
+        return reinterpret_cast<UKismetMathLibrary *>(Obj);
     }
 };
 

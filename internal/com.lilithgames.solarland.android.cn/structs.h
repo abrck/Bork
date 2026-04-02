@@ -5,6 +5,8 @@
 #include <cmath>
 #include <cstdint>
 #include <unistd.h>
+#include <cfloat>
+#include <algorithm>
 
 template <typename T>
 struct TArray
