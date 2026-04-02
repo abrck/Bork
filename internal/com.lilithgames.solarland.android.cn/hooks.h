@@ -21,7 +21,7 @@ void hkDrawTransition(void *GameViewport, UCanvas *Canvas)
 {
     oDrawTransition(GameViewport, Canvas);
 
-    GameData::World = *(UWorld**)((uintptr_t)GameData::GameViewport + Offsets::World);
+    GameData::World = *(UWorld **)((uintptr_t)GameData::GameViewport + Offsets::World);
     if (IsBadPtr(GameData::World))
         return;
     LOGI("World: %p", GameData::World);
@@ -78,76 +78,71 @@ void hkDrawTransition(void *GameViewport, UCanvas *Canvas)
             PlayerName = PlayerState->GetPlayerName().ToString();
         }
 
-        int Distance = (int)Player->GetDistanceTo((AActor*)GameData::MyPawn);
+        int Distance = (int)Player->GetDistanceTo((AActor *)GameData::MyPawn);
 
         USkeletalMeshComponent *Mesh = *(USkeletalMeshComponent **)((uintptr_t)Player + Offsets::Mesh);
         if (IsBadPtr(Mesh))
             continue;
 
-        BoneIndex* BoneIdx = Mesh->GetBoneIndex();
+        BoneIndex *BoneIdx = Mesh->GetBoneIndex();
 
-        FVector BoxCoords[2];
+        FVector2D BoxCoords[2];
         if (!Mesh->GetBoxCoords(GameData::MyController, BoxCoords))
             continue;
 
-        FVector2D BoxScreenPos[2];
-        if (!GameData::MyController->ProjectWorldLocationToScreen(BoxCoords[0], BoxScreenPos[0]) || 
-            !GameData::MyController->ProjectWorldLocationToScreen(BoxCoords[1], BoxScreenPos[1]))
-            continue;
-
-        float x = BoxScreenPos[0].X;
-        float y = BoxScreenPos[0].Y;
-        float w = BoxScreenPos[1].X - BoxScreenPos[0].X;
-        float h = BoxScreenPos[1].Y - BoxScreenPos[0].Y;
+        float x = BoxCoords[0].X;
+        float y = BoxCoords[0].Y;
+        float w = BoxCoords[1].X - BoxCoords[0].X;
+        float h = BoxCoords[1].Y - BoxCoords[0].Y;
 
         FVector2D RootScreenPos;
         FVector RootPos = Mesh->GetBoneLocation(BoneIdx->root);
         GameData::MyController->ProjectWorldLocationToScreen(RootPos, RootScreenPos);
 
         bool IsRootBlocked;
-        IsRootBlocked = !GameData::MyController->LineOfSightTo((AActor*)GameData::MyCameraManager, RootPos, false);
+        IsRootBlocked = !GameData::MyController->LineOfSightTo((AActor *)GameData::MyCameraManager, RootPos, false);
 
         FVector2D HeadScreenPos;
         FVector HeadPos = Mesh->GetBoneLocation(BoneIdx->head);
         GameData::MyController->ProjectWorldLocationToScreen(HeadPos, HeadScreenPos);
 
         bool IsHeadBlocked;
-        IsHeadBlocked = !GameData::MyController->LineOfSightTo((AActor*)GameData::MyCameraManager, HeadPos, false);
+        IsHeadBlocked = !GameData::MyController->LineOfSightTo((AActor *)GameData::MyCameraManager, HeadPos, false);
 
         FVector2D NeckScreenPos;
         FVector NeckPos = Mesh->GetBoneLocation(BoneIdx->neck_01);
         GameData::MyController->ProjectWorldLocationToScreen(NeckPos, NeckScreenPos);
 
         bool IsNeckBlocked;
-        IsNeckBlocked = !GameData::MyController->LineOfSightTo((AActor*)GameData::MyCameraManager, NeckPos, false);
+        IsNeckBlocked = !GameData::MyController->LineOfSightTo((AActor *)GameData::MyCameraManager, NeckPos, false);
 
         FVector2D Spine3ScreenPos;
         FVector Spine3Pos = Mesh->GetBoneLocation(BoneIdx->spine_03);
         GameData::MyController->ProjectWorldLocationToScreen(Spine3Pos, Spine3ScreenPos);
 
         bool IsSpine3Blocked;
-        IsSpine3Blocked = !GameData::MyController->LineOfSightTo((AActor*)GameData::MyCameraManager, Spine3Pos, false);
+        IsSpine3Blocked = !GameData::MyController->LineOfSightTo((AActor *)GameData::MyCameraManager, Spine3Pos, false);
 
         FVector2D Spine2ScreenPos;
         FVector Spine2Pos = Mesh->GetBoneLocation(BoneIdx->spine_02);
         GameData::MyController->ProjectWorldLocationToScreen(Spine2Pos, Spine2ScreenPos);
 
         bool IsSpine2Blocked;
-        IsSpine2Blocked = !GameData::MyController->LineOfSightTo((AActor*)GameData::MyCameraManager, Spine2Pos, false);
+        IsSpine2Blocked = !GameData::MyController->LineOfSightTo((AActor *)GameData::MyCameraManager, Spine2Pos, false);
 
         FVector2D Spine1ScreenPos;
         FVector Spine1Pos = Mesh->GetBoneLocation(BoneIdx->spine_01);
         GameData::MyController->ProjectWorldLocationToScreen(Spine1Pos, Spine1ScreenPos);
 
         bool IsSpine1Blocked;
-        IsSpine1Blocked = !GameData::MyController->LineOfSightTo((AActor*)GameData::MyCameraManager, Spine1Pos, false);
+        IsSpine1Blocked = !GameData::MyController->LineOfSightTo((AActor *)GameData::MyCameraManager, Spine1Pos, false);
 
         FVector2D PelvisScreenPos;
         FVector PelvisPos = Mesh->GetBoneLocation(BoneIdx->pelvis);
         GameData::MyController->ProjectWorldLocationToScreen(PelvisPos, PelvisScreenPos);
 
         bool IsPelvisBlocked;
-        IsPelvisBlocked = !GameData::MyController->LineOfSightTo((AActor*)GameData::MyCameraManager, PelvisPos, false);
+        IsPelvisBlocked = !GameData::MyController->LineOfSightTo((AActor *)GameData::MyCameraManager, PelvisPos, false);
 
         // 左手
         FVector2D ClavicleLScreenPos;
@@ -155,28 +150,28 @@ void hkDrawTransition(void *GameViewport, UCanvas *Canvas)
         GameData::MyController->ProjectWorldLocationToScreen(ClavicleLPos, ClavicleLScreenPos);
 
         bool IsClavicleLBlocked;
-        IsClavicleLBlocked = !GameData::MyController->LineOfSightTo((AActor*)GameData::MyCameraManager, ClavicleLPos, false);
+        IsClavicleLBlocked = !GameData::MyController->LineOfSightTo((AActor *)GameData::MyCameraManager, ClavicleLPos, false);
 
         FVector2D UpperArmLScreenPos;
         FVector UpperArmLPos = Mesh->GetBoneLocation(BoneIdx->upperarm_l);
         GameData::MyController->ProjectWorldLocationToScreen(UpperArmLPos, UpperArmLScreenPos);
 
         bool IsUpperArmLBlocked;
-        IsUpperArmLBlocked = !GameData::MyController->LineOfSightTo((AActor*)GameData::MyCameraManager, UpperArmLPos, false);
+        IsUpperArmLBlocked = !GameData::MyController->LineOfSightTo((AActor *)GameData::MyCameraManager, UpperArmLPos, false);
 
         FVector2D LowerArmLScreenPos;
         FVector LowerArmLPos = Mesh->GetBoneLocation(BoneIdx->lowerarm_l);
         GameData::MyController->ProjectWorldLocationToScreen(LowerArmLPos, LowerArmLScreenPos);
 
         bool IsLowerArmLBlocked;
-        IsLowerArmLBlocked = !GameData::MyController->LineOfSightTo((AActor*)GameData::MyCameraManager, LowerArmLPos, false);
+        IsLowerArmLBlocked = !GameData::MyController->LineOfSightTo((AActor *)GameData::MyCameraManager, LowerArmLPos, false);
 
         FVector2D HandLScreenPos;
         FVector HandLPos = Mesh->GetBoneLocation(BoneIdx->hand_l);
         GameData::MyController->ProjectWorldLocationToScreen(HandLPos, HandLScreenPos);
 
         bool IsHandLBlocked;
-        IsHandLBlocked = !GameData::MyController->LineOfSightTo((AActor*)GameData::MyCameraManager, HandLPos, false);
+        IsHandLBlocked = !GameData::MyController->LineOfSightTo((AActor *)GameData::MyCameraManager, HandLPos, false);
 
         // 右手
         FVector2D ClavicleRScreenPos;
@@ -184,28 +179,28 @@ void hkDrawTransition(void *GameViewport, UCanvas *Canvas)
         GameData::MyController->ProjectWorldLocationToScreen(ClavicleRPos, ClavicleRScreenPos);
 
         bool IsClavicleRBlocked;
-        IsClavicleRBlocked = !GameData::MyController->LineOfSightTo((AActor*)GameData::MyCameraManager, ClavicleRPos, false);
+        IsClavicleRBlocked = !GameData::MyController->LineOfSightTo((AActor *)GameData::MyCameraManager, ClavicleRPos, false);
 
         FVector2D UpperArmRScreenPos;
         FVector UpperArmRPos = Mesh->GetBoneLocation(BoneIdx->upperarm_r);
         GameData::MyController->ProjectWorldLocationToScreen(UpperArmRPos, UpperArmRScreenPos);
 
         bool IsUpperArmRBlocked;
-        IsUpperArmRBlocked = !GameData::MyController->LineOfSightTo((AActor*)GameData::MyCameraManager, UpperArmRPos, false);
+        IsUpperArmRBlocked = !GameData::MyController->LineOfSightTo((AActor *)GameData::MyCameraManager, UpperArmRPos, false);
 
         FVector2D LowerArmRScreenPos;
         FVector LowerArmRPos = Mesh->GetBoneLocation(BoneIdx->lowerarm_r);
         GameData::MyController->ProjectWorldLocationToScreen(LowerArmRPos, LowerArmRScreenPos);
 
         bool IsLowerArmRBlocked;
-        IsLowerArmRBlocked = !GameData::MyController->LineOfSightTo((AActor*)GameData::MyCameraManager, LowerArmRPos, false);
+        IsLowerArmRBlocked = !GameData::MyController->LineOfSightTo((AActor *)GameData::MyCameraManager, LowerArmRPos, false);
 
         FVector2D HandRScreenPos;
         FVector HandRPos = Mesh->GetBoneLocation(BoneIdx->hand_r);
         GameData::MyController->ProjectWorldLocationToScreen(HandRPos, HandRScreenPos);
 
         bool IsHandRBlocked;
-        IsHandRBlocked = !GameData::MyController->LineOfSightTo((AActor*)GameData::MyCameraManager, HandRPos, false);
+        IsHandRBlocked = !GameData::MyController->LineOfSightTo((AActor *)GameData::MyCameraManager, HandRPos, false);
 
         // 左腿
         FVector2D ThighLScreenPos;
@@ -213,21 +208,21 @@ void hkDrawTransition(void *GameViewport, UCanvas *Canvas)
         GameData::MyController->ProjectWorldLocationToScreen(ThighLPos, ThighLScreenPos);
 
         bool IsThighLBlocked;
-        IsThighLBlocked = !GameData::MyController->LineOfSightTo((AActor*)GameData::MyCameraManager, ThighLPos, false);
+        IsThighLBlocked = !GameData::MyController->LineOfSightTo((AActor *)GameData::MyCameraManager, ThighLPos, false);
 
         FVector2D CalfLScreenPos;
         FVector CalfLPos = Mesh->GetBoneLocation(BoneIdx->calf_l);
         GameData::MyController->ProjectWorldLocationToScreen(CalfLPos, CalfLScreenPos);
 
         bool IsCalfLBlocked;
-        IsCalfLBlocked = !GameData::MyController->LineOfSightTo((AActor*)GameData::MyCameraManager, CalfLPos, false);
+        IsCalfLBlocked = !GameData::MyController->LineOfSightTo((AActor *)GameData::MyCameraManager, CalfLPos, false);
 
         FVector2D FootLScreenPos;
         FVector FootLPos = Mesh->GetBoneLocation(BoneIdx->foot_l);
         GameData::MyController->ProjectWorldLocationToScreen(FootLPos, FootLScreenPos);
 
         bool IsFootLBlocked;
-        IsFootLBlocked = !GameData::MyController->LineOfSightTo((AActor*)GameData::MyCameraManager, FootLPos, false);
+        IsFootLBlocked = !GameData::MyController->LineOfSightTo((AActor *)GameData::MyCameraManager, FootLPos, false);
 
         // 右腿
         FVector2D ThighRScreenPos;
@@ -235,21 +230,21 @@ void hkDrawTransition(void *GameViewport, UCanvas *Canvas)
         GameData::MyController->ProjectWorldLocationToScreen(ThighRPos, ThighRScreenPos);
 
         bool IsThighRBlocked;
-        IsThighRBlocked = !GameData::MyController->LineOfSightTo((AActor*)GameData::MyCameraManager, ThighRPos, false);
+        IsThighRBlocked = !GameData::MyController->LineOfSightTo((AActor *)GameData::MyCameraManager, ThighRPos, false);
 
         FVector2D CalfRScreenPos;
         FVector CalfRPos = Mesh->GetBoneLocation(BoneIdx->calf_r);
         GameData::MyController->ProjectWorldLocationToScreen(CalfRPos, CalfRScreenPos);
 
         bool IsCalfRBlocked;
-        IsCalfRBlocked = !GameData::MyController->LineOfSightTo((AActor*)GameData::MyCameraManager, CalfRPos, false);
+        IsCalfRBlocked = !GameData::MyController->LineOfSightTo((AActor *)GameData::MyCameraManager, CalfRPos, false);
 
         FVector2D FootRScreenPos;
         FVector FootRPos = Mesh->GetBoneLocation(BoneIdx->foot_r);
         GameData::MyController->ProjectWorldLocationToScreen(FootRPos, FootRScreenPos);
 
         bool IsFootRBlocked;
-        IsFootRBlocked = !GameData::MyController->LineOfSightTo((AActor*)GameData::MyCameraManager, FootRPos, false);
+        IsFootRBlocked = !GameData::MyController->LineOfSightTo((AActor *)GameData::MyCameraManager, FootRPos, false);
 
         // =======================================================================================================
 
@@ -263,10 +258,10 @@ void hkDrawTransition(void *GameViewport, UCanvas *Canvas)
                     return IsBot ? ColorCyan : ColorGreen;
             };
 
-            Canvas->K2_DrawLine(FVector2D(Canvas->GetSize().X / 2, 0), FVector2D((BoxScreenPos[0].X + BoxScreenPos[1].X) / 2.0f, BoxScreenPos[0].Y), 1.0f, GetLineColor(IsHeadBlocked));
-        
-            Canvas->K2_DrawLine(FVector2D(x, y), FVector2D(x + w, y), 1.0f, GetLineColor(IsHeadBlocked));       // Top
-            Canvas->K2_DrawLine(FVector2D(x, y), FVector2D(x, y + h), 1.0f, GetLineColor(IsHeadBlocked));       // Left
+            Canvas->K2_DrawLine(FVector2D(Canvas->GetSize().X / 2, 0), FVector2D((BoxCoords[0].X + BoxCoords[1].X) / 2.0f, BoxCoords[0].Y), 1.0f, GetLineColor(IsHeadBlocked));
+
+            Canvas->K2_DrawLine(FVector2D(x, y), FVector2D(x + w, y), 1.0f, GetLineColor(IsHeadBlocked));         // Top
+            Canvas->K2_DrawLine(FVector2D(x, y), FVector2D(x, y + h), 1.0f, GetLineColor(IsHeadBlocked));         // Left
             Canvas->K2_DrawLine(FVector2D(x + w, y), FVector2D(x + w, y + h), 1.0f, GetLineColor(IsHeadBlocked)); // Right
             Canvas->K2_DrawLine(FVector2D(x, y + h), FVector2D(x + w, y + h), 1.0f, GetLineColor(IsHeadBlocked)); // Bottom
         }
@@ -274,7 +269,7 @@ void hkDrawTransition(void *GameViewport, UCanvas *Canvas)
         // 绘制名字/距离
         {
             std::string NameText = std::string(PlayerName) + " [" + std::to_string(Distance / 100.0f) + "m]";
-            Canvas->K2_DrawText(GameData::GEngine->GetTinyFont(), 13, FString::FromAnsi(NameText.c_str()), FVector2D((BoxScreenPos[0].X + BoxScreenPos[1].X) / 2, BoxScreenPos[0].Y + h + 15), ColorWhite, true, true, true, ColorBlack);
+            Canvas->K2_DrawText(GameData::GEngine->GetTinyFont(), 13, FString::FromAnsi(NameText.c_str()), FVector2D((BoxCoords[0].X + BoxCoords[1].X) / 2, BoxCoords[0].Y + h + 15), ColorWhite, true, true, true, ColorBlack);
         }
 
         // 绘制骨骼

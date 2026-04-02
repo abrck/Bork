@@ -26,20 +26,20 @@ public:
         uint32_t Block = Id >> 16;
         uint16_t Offset = Id & 0xFFFF;
 
-        FNamePool* NamePool =
-            (FNamePool*)(Globals::libUE4 + Offsets::GName);
+        FNamePool *NamePool =
+            (FNamePool *)(Globals::libUE4 + Offsets::GName);
 
-        uint8_t* Entry =
+        uint8_t *Entry =
             NamePool->Blocks[Block] + Offset * 2;
 
-        uint16_t Header = *(uint16_t*)Entry;
+        uint16_t Header = *(uint16_t *)Entry;
 
         int Len = Header >> 6;
 
         if (Len <= 0 || Len > 250)
             return "None";
 
-        return std::string((char*)(Entry + 2), Len);
+        return std::string((char *)(Entry + 2), Len);
     }
 
     static UObject *StaticClass()
@@ -55,8 +55,8 @@ class AActor : public UObject
 {
 public:
     // Object: Function Engine.Actor.GetDistanceTo
-	// Flags: [Final|Native|Public|BlueprintCallable|BlueprintPure|Const]
-	float GetDistanceTo(AActor* OtherActor)
+    // Flags: [Final|Native|Public|BlueprintCallable|BlueprintPure|Const]
+    float GetDistanceTo(AActor *OtherActor)
     {
         static UObject *Func = nullptr;
         if (!Func)
@@ -64,7 +64,7 @@ public:
 
         struct
         {
-            AActor* OtherActor;
+            AActor *OtherActor;
             float ReturnValue;
         } Params = {OtherActor};
 
@@ -72,15 +72,14 @@ public:
 
         return Params.ReturnValue;
     }
-
 };
 
 class APlayerState : public AActor
 {
 public:
-	// Object: Function Engine.PlayerState.GetPlayerName
-	// Flags: [Final|Native|Public|BlueprintCallable|BlueprintPure|Const]
-	FString GetPlayerName()
+    // Object: Function Engine.PlayerState.GetPlayerName
+    // Flags: [Final|Native|Public|BlueprintCallable|BlueprintPure|Const]
+    FString GetPlayerName()
     {
         static UObject *Func = nullptr;
         if (!Func)
@@ -142,9 +141,9 @@ public:
 class ASolarCharacterBase : public AModularCharacter
 {
 public:
-	// Object: Function Solarland.SolarCharacterBase.K2_IsAlive
-	// Flags: [Final|Native|Public|BlueprintCallable|BlueprintPure|Const]
-	bool K2_IsAlive()
+    // Object: Function Solarland.SolarCharacterBase.K2_IsAlive
+    // Flags: [Final|Native|Public|BlueprintCallable|BlueprintPure|Const]
+    bool K2_IsAlive()
     {
         static UObject *Func = nullptr;
         if (!Func)
@@ -159,15 +158,14 @@ public:
 
         return Params.ReturnValue;
     }
-
 };
 
 class ASolarCharacter : public ASolarCharacterBase
 {
 public:
-	// Object: Function Solarland.SolarCharacter.GetSolarPlayerState
-	// Flags: [Final|RequiredAPI|Native|Public|BlueprintCallable|BlueprintPure|Const]
-	ASolarPlayerState* GetSolarPlayerState()
+    // Object: Function Solarland.SolarCharacter.GetSolarPlayerState
+    // Flags: [Final|RequiredAPI|Native|Public|BlueprintCallable|BlueprintPure|Const]
+    ASolarPlayerState *GetSolarPlayerState()
     {
         static UObject *Func = nullptr;
         if (!Func)
@@ -175,7 +173,7 @@ public:
 
         struct
         {
-            ASolarPlayerState* ReturnValue;
+            ASolarPlayerState *ReturnValue;
         } Params;
 
         ProcessEvent(Func, &Params);
@@ -195,9 +193,9 @@ public:
 class AController : public AActor
 {
 public:
-	// Object: Function Engine.Controller.LineOfSightTo
-	// Flags: [Native|Public|HasDefaults|BlueprintCallable|BlueprintPure|Const]
-	bool LineOfSightTo(AActor* Other, FVector ViewPoint, bool bAlternateChecks)
+    // Object: Function Engine.Controller.LineOfSightTo
+    // Flags: [Native|Public|HasDefaults|BlueprintCallable|BlueprintPure|Const]
+    bool LineOfSightTo(AActor *Other, FVector ViewPoint, bool bAlternateChecks)
     {
         static UObject *Func = nullptr;
         if (!Func)
@@ -205,7 +203,7 @@ public:
 
         struct
         {
-            AActor* Other;
+            AActor *Other;
             FVector ViewPoint;
             bool bAlternateChecks;
             bool ReturnValue;
@@ -238,11 +236,11 @@ public:
 class APlayerController : public AController
 {
 public:
-	// Object: Function Engine.PlayerController.ProjectWorldLocationToScreen
-	// Flags: [Final|Native|Public|HasOutParms|HasDefaults|BlueprintCallable|BlueprintPure|Const]
-    bool ProjectWorldLocationToScreen(FVector WorldLocation, FVector2D& ScreenLocation)
+    // Object: Function Engine.PlayerController.ProjectWorldLocationToScreen
+    // Flags: [Final|Native|Public|HasOutParms|HasDefaults|BlueprintCallable|BlueprintPure|Const]
+    bool ProjectWorldLocationToScreen(FVector WorldLocation, FVector2D &ScreenLocation)
     {
-        static UObject* Func = nullptr;
+        static UObject *Func = nullptr;
         if (!Func)
             Func = UObject::StaticFindObject(u"/Script/Engine.PlayerController:ProjectWorldLocationToScreen");
 
@@ -291,7 +289,6 @@ public:
 class USceneComponent : public UActorComponent
 {
 public:
-
 };
 
 class UPrimitiveComponent : public USceneComponent
@@ -308,10 +305,10 @@ class USkinnedMeshComponent : public UMeshComponent
 {
 public:
     // Object: Function Engine.SkinnedMeshComponent.GetBoneName
-	// Flags: [Final|Native|Public|BlueprintCallable|BlueprintPure|Const]
-	FName GetBoneName(int32_t BoneIndex)
+    // Flags: [Final|Native|Public|BlueprintCallable|BlueprintPure|Const]
+    FName GetBoneName(int32_t BoneIndex)
     {
-        static UObject* Func = nullptr;
+        static UObject *Func = nullptr;
         if (!Func)
             Func = UObject::StaticFindObject(u"/Script/Engine.SkinnedMeshComponent:GetBoneName");
 
@@ -326,11 +323,11 @@ public:
         return Params.ReturnValue;
     }
 
-	// Object: Function Engine.SkinnedMeshComponent.GetNumBones
-	// Flags: [Final|Native|Public|BlueprintCallable|BlueprintPure|Const]
-	int32_t GetNumBones()
+    // Object: Function Engine.SkinnedMeshComponent.GetNumBones
+    // Flags: [Final|Native|Public|BlueprintCallable|BlueprintPure|Const]
+    int32_t GetNumBones()
     {
-        static UObject* Func = nullptr;
+        static UObject *Func = nullptr;
         if (!Func)
             Func = UObject::StaticFindObject(u"/Script/Engine.SkinnedMeshComponent:GetNumBones");
 
@@ -344,14 +341,14 @@ public:
         return Params.ReturnValue;
     }
 
-	// Object: Function Engine.SkinnedMeshComponent.TransformFromBoneSpace
-	// Flags: [Final|Native|Public|HasOutParms|HasDefaults|BlueprintCallable]
-    void TransformFromBoneSpace(FName BoneName, const FVector& InPosition, const FRotator& InRotation, FVector& OutPosition, FRotator& OutRotation)
+    // Object: Function Engine.SkinnedMeshComponent.TransformFromBoneSpace
+    // Flags: [Final|Native|Public|HasOutParms|HasDefaults|BlueprintCallable]
+    void TransformFromBoneSpace(FName BoneName, const FVector &InPosition, const FRotator &InRotation, FVector &OutPosition, FRotator &OutRotation)
     {
-        static UObject* Func = nullptr;
+        static UObject *Func = nullptr;
         if (!Func)
             Func = UObject::StaticFindObject(u"/Script/Engine.SkinnedMeshComponent:TransformFromBoneSpace");
-        
+
         struct
         {
             FName BoneName;
@@ -360,7 +357,7 @@ public:
             FVector OutPosition;
             FRotator OutRotation;
         } Params = {BoneName, InPosition, InRotation, {}, {}};
-        
+
         ProcessEvent(Func, &Params);
 
         OutPosition = Params.OutPosition;
@@ -369,16 +366,17 @@ public:
 
     FVector GetBoneLocation(FName BoneName)
     {
-        FVector OutPos; FRotator OutRot;
+        FVector OutPos;
+        FRotator OutRot;
         TransformFromBoneSpace(BoneName, FVector(), FRotator(), OutPos, OutRot);
         return OutPos;
     }
 
-    BoneIndex* GetBoneIndex()
+    BoneIndex *GetBoneIndex()
     {
         static std::unordered_map<int, std::unique_ptr<BoneIndex>> BoneIdxCache;
         int Num = GetNumBones();
-        
+
         auto it = BoneIdxCache.find(Num);
         if (it != BoneIdxCache.end())
             return it->second.get();
@@ -391,93 +389,94 @@ public:
             int NameIdx = GetBoneName(i).ComparisonIndex;
             std::string BoneName = UObject::GetName(NameIdx);
 
-            if (BoneName == "head") NewBoneIdx->head = NameIdx;
-            else if (BoneName == "neck_01") NewBoneIdx->neck_01 = NameIdx;
-            else if (BoneName == "spine_03") NewBoneIdx->spine_03 = NameIdx;
-            else if (BoneName == "spine_02") NewBoneIdx->spine_02 = NameIdx;
-            else if (BoneName == "spine_01") NewBoneIdx->spine_01 = NameIdx;
-            else if (BoneName == "pelvis") NewBoneIdx->pelvis = NameIdx;
-            else if (BoneName == "Root") NewBoneIdx->root = NameIdx;
-            else if (BoneName == "hand_l") NewBoneIdx->hand_l = NameIdx;
-            else if (BoneName == "lowerarm_l") NewBoneIdx->lowerarm_l = NameIdx;
-            else if (BoneName == "upperarm_l") NewBoneIdx->upperarm_l = NameIdx;
-            else if (BoneName == "clavicle_l") NewBoneIdx->clavicle_l = NameIdx;
-            else if (BoneName == "hand_r") NewBoneIdx->hand_r = NameIdx;
-            else if (BoneName == "lowerarm_r") NewBoneIdx->lowerarm_r = NameIdx;
-            else if (BoneName == "upperarm_r") NewBoneIdx->upperarm_r = NameIdx;
-            else if (BoneName == "clavicle_r") NewBoneIdx->clavicle_r = NameIdx;
-            else if (BoneName == "ball_l") NewBoneIdx->ball_l = NameIdx;
-            else if (BoneName == "foot_l") NewBoneIdx->foot_l = NameIdx;
-            else if (BoneName == "calf_l") NewBoneIdx->calf_l = NameIdx;
-            else if (BoneName == "thigh_l") NewBoneIdx->thigh_l = NameIdx;
-            else if (BoneName == "ball_r") NewBoneIdx->ball_r = NameIdx;
-            else if (BoneName == "foot_r") NewBoneIdx->foot_r = NameIdx;
-            else if (BoneName == "calf_r") NewBoneIdx->calf_r = NameIdx;
-            else if (BoneName == "thigh_r") NewBoneIdx->thigh_r = NameIdx;
+            if (BoneName == "head")
+                NewBoneIdx->head = NameIdx;
+            else if (BoneName == "neck_01")
+                NewBoneIdx->neck_01 = NameIdx;
+            else if (BoneName == "spine_03")
+                NewBoneIdx->spine_03 = NameIdx;
+            else if (BoneName == "spine_02")
+                NewBoneIdx->spine_02 = NameIdx;
+            else if (BoneName == "spine_01")
+                NewBoneIdx->spine_01 = NameIdx;
+            else if (BoneName == "pelvis")
+                NewBoneIdx->pelvis = NameIdx;
+            else if (BoneName == "Root")
+                NewBoneIdx->root = NameIdx;
+            else if (BoneName == "hand_l")
+                NewBoneIdx->hand_l = NameIdx;
+            else if (BoneName == "lowerarm_l")
+                NewBoneIdx->lowerarm_l = NameIdx;
+            else if (BoneName == "upperarm_l")
+                NewBoneIdx->upperarm_l = NameIdx;
+            else if (BoneName == "clavicle_l")
+                NewBoneIdx->clavicle_l = NameIdx;
+            else if (BoneName == "hand_r")
+                NewBoneIdx->hand_r = NameIdx;
+            else if (BoneName == "lowerarm_r")
+                NewBoneIdx->lowerarm_r = NameIdx;
+            else if (BoneName == "upperarm_r")
+                NewBoneIdx->upperarm_r = NameIdx;
+            else if (BoneName == "clavicle_r")
+                NewBoneIdx->clavicle_r = NameIdx;
+            else if (BoneName == "ball_l")
+                NewBoneIdx->ball_l = NameIdx;
+            else if (BoneName == "foot_l")
+                NewBoneIdx->foot_l = NameIdx;
+            else if (BoneName == "calf_l")
+                NewBoneIdx->calf_l = NameIdx;
+            else if (BoneName == "thigh_l")
+                NewBoneIdx->thigh_l = NameIdx;
+            else if (BoneName == "ball_r")
+                NewBoneIdx->ball_r = NameIdx;
+            else if (BoneName == "foot_r")
+                NewBoneIdx->foot_r = NameIdx;
+            else if (BoneName == "calf_r")
+                NewBoneIdx->calf_r = NameIdx;
+            else if (BoneName == "thigh_r")
+                NewBoneIdx->thigh_r = NameIdx;
         }
 
-        BoneIndex* result = NewBoneIdx.get();
+        BoneIndex *result = NewBoneIdx.get();
         BoneIdxCache.emplace(Num, std::move(NewBoneIdx));
         return result;
     }
 
-    bool GetBoxCoords(ASolarPlayerController *MyController, FVector* Coords)
+    bool GetBoxCoords(ASolarPlayerController *MyController, FVector2D *Coords)
     {
-        BoneIndex* BoneIdx = GetBoneIndex();
-
-        FVector BoneList[] = {
-            GetBoneLocation(BoneIdx->head),
-            GetBoneLocation(BoneIdx->neck_01),
-            GetBoneLocation(BoneIdx->spine_03),
-            GetBoneLocation(BoneIdx->spine_02),
-            GetBoneLocation(BoneIdx->spine_01),
-            GetBoneLocation(BoneIdx->pelvis),
-            GetBoneLocation(BoneIdx->hand_l),
-            GetBoneLocation(BoneIdx->lowerarm_l),
-            GetBoneLocation(BoneIdx->upperarm_l),
-            GetBoneLocation(BoneIdx->clavicle_l),
-            GetBoneLocation(BoneIdx->hand_r),
-            GetBoneLocation(BoneIdx->lowerarm_r),
-            GetBoneLocation(BoneIdx->upperarm_r),
-            GetBoneLocation(BoneIdx->clavicle_r),
-            GetBoneLocation(BoneIdx->ball_l),
-            GetBoneLocation(BoneIdx->foot_l),
-            GetBoneLocation(BoneIdx->calf_l),
-            GetBoneLocation(BoneIdx->thigh_l),
-            GetBoneLocation(BoneIdx->ball_r),
-            GetBoneLocation(BoneIdx->foot_r),
-            GetBoneLocation(BoneIdx->calf_r),
-            GetBoneLocation(BoneIdx->thigh_r)
-        };
-
+        BoneIndex *BoneIdx = GetBoneIndex();
+        int32_t BoneList[] = {BoneIdx->head, BoneIdx->neck_01, BoneIdx->spine_03, BoneIdx->spine_02, BoneIdx->spine_01, BoneIdx->pelvis, BoneIdx->hand_l, BoneIdx->lowerarm_l, BoneIdx->upperarm_l, BoneIdx->clavicle_l, BoneIdx->hand_r, BoneIdx->lowerarm_r, BoneIdx->upperarm_r, BoneIdx->clavicle_r, BoneIdx->ball_l, BoneIdx->foot_l, BoneIdx->calf_l, BoneIdx->thigh_l, BoneIdx->ball_r, BoneIdx->foot_r, BoneIdx->calf_r, BoneIdx->thigh_r};
+        
         float MinX = FLT_MAX, MinY = FLT_MAX;
         float MaxX = -FLT_MAX, MaxY = -FLT_MAX;
-
+        
         bool Found = false;
-
-        for (int i = 0; i < sizeof(BoneList) / sizeof(FVector); i++)
+        for (int i = 0; i < sizeof(BoneList) / sizeof(int32_t); i++)
         {
-            FVector Screen;
-            if (!MyController->ProjectWorldLocationToScreen(BoneList[i], Screen))
+            int Bone = BoneList[i];
+            if (Bone <= 0)
                 continue;
-
+            FVector2D Screen;
+            if (!MyController->ProjectWorldLocationToScreen(GetBoneLocation(Bone), Screen))
+                continue;
             Found = true;
-
-            if (Screen.X < MinX) MinX = Screen.X;
-            if (Screen.X > MaxX) MaxX = Screen.X;
-            if (Screen.Y < MinY) MinY = Screen.Y;
-            if (Screen.Y > MaxY) MaxY = Screen.Y;
+            if (Screen.X < MinX)
+                MinX = Screen.X;
+            if (Screen.X > MaxX)
+                MaxX = Screen.X;
+            if (Screen.Y < MinY)
+                MinY = Screen.Y;
+            if (Screen.Y > MaxY)
+                MaxY = Screen.Y;
         }
-
         if (!Found)
             return false;
-
         float PaddingX = (MaxX - MinX) * 0.1f;
         float PaddingY = (MaxY - MinY) * 0.1f;
-
-        Coords[0] = FVector(MinX - PaddingX, MinY - PaddingY, 0);  // 左上角
-        Coords[1] = FVector(MaxX + PaddingX, MaxY + PaddingY, 0);  // 右下角
-
+        Coords[0].X = MinX - PaddingX;
+        Coords[0].Y = MinY - PaddingY;
+        Coords[1].X = MaxX + PaddingX;
+        Coords[1].Y = MaxY + PaddingY;
         return true;
     }
 };
@@ -509,7 +508,7 @@ public:
 class UEngine : public UObject
 {
 public:
-    UFont* GetTinyFont()
+    UFont *GetTinyFont()
     {
         return *reinterpret_cast<UFont **>((uintptr_t)this + Offsets::TinyFont);
     }
@@ -520,12 +519,12 @@ class UCanvas : public UObject
 public:
     FVector2D GetSize()
     {
-        return FVector2D(*(int*)((uintptr_t)this + Offsets::SizeX), *(int*)((uintptr_t)this + Offsets::SizeY));
+        return FVector2D(*(int *)((uintptr_t)this + Offsets::SizeX), *(int *)((uintptr_t)this + Offsets::SizeY));
     }
 
-	// Object: Function Engine.Canvas.K2_DrawText
-	// Flags: [Final|Native|Public|HasDefaults|BlueprintCallable]
-	void K2_DrawText(UFont* RenderFont, FString RenderText, FVector2D ScreenPosition, FVector2D Scale, FLinearColor RenderColor, float Kerning, FLinearColor ShadowColor, FVector2D ShadowOffset, bool bCentreX, bool bCentreY, bool bOutlined, FLinearColor OutlineColor)
+    // Object: Function Engine.Canvas.K2_DrawText
+    // Flags: [Final|Native|Public|HasDefaults|BlueprintCallable]
+    void K2_DrawText(UFont *RenderFont, FString RenderText, FVector2D ScreenPosition, FVector2D Scale, FLinearColor RenderColor, float Kerning, FLinearColor ShadowColor, FVector2D ShadowOffset, bool bCentreX, bool bCentreY, bool bOutlined, FLinearColor OutlineColor)
     {
         static UObject *Func = nullptr;
         if (!Func)
@@ -533,7 +532,7 @@ public:
 
         struct
         {
-            UFont* RenderFont;
+            UFont *RenderFont;
             FString RenderText;
             FVector2D ScreenPosition;
             FVector2D Scale;
@@ -550,9 +549,9 @@ public:
         ProcessEvent(Func, &Params);
     }
 
-	// Object: Function Engine.Canvas.K2_DrawLine
-	// Flags: [Final|Native|Public|HasDefaults|BlueprintCallable]
-	void K2_DrawLine(FVector2D ScreenPositionA, FVector2D ScreenPositionB, float Thickness, FLinearColor RenderColor)
+    // Object: Function Engine.Canvas.K2_DrawLine
+    // Flags: [Final|Native|Public|HasDefaults|BlueprintCallable]
+    void K2_DrawLine(FVector2D ScreenPositionA, FVector2D ScreenPositionB, float Thickness, FLinearColor RenderColor)
     {
         static UObject *Func = nullptr;
         if (!Func)
@@ -569,7 +568,7 @@ public:
         ProcessEvent(Func, &Params);
     }
 
-    void K2_DrawText(UFont* RenderFont, int RenderFontSize, FString RenderText, FVector2D ScreenPosition, FLinearColor RenderColor, bool bCentreX, bool bCentreY, bool bOutlined, FLinearColor OutlineColor)
+    void K2_DrawText(UFont *RenderFont, int RenderFontSize, FString RenderText, FVector2D ScreenPosition, FLinearColor RenderColor, bool bCentreX, bool bCentreY, bool bOutlined, FLinearColor OutlineColor)
     {
         int OrigFontSize = RenderFont->GetFontSize();
         RenderFont->SetFontSize(RenderFontSize);
@@ -586,9 +585,9 @@ public:
 class UKismetStringLibrary : public UBlueprintFunctionLibrary
 {
 public:
-	// Object: Function Engine.KismetStringLibrary.Conv_StringToName
-	// Flags: [Final|Native|Static|Public|BlueprintCallable|BlueprintPure]
-	static FName Conv_StringToName(FString InString)
+    // Object: Function Engine.KismetStringLibrary.Conv_StringToName
+    // Flags: [Final|Native|Static|Public|BlueprintCallable|BlueprintPure]
+    static FName Conv_StringToName(FString InString)
     {
         static UObject *Func = nullptr;
         if (!Func)
@@ -605,9 +604,9 @@ public:
         return Params.ReturnValue;
     }
 
-	// Object: Function Engine.KismetStringLibrary.Conv_ObjectToString
-	// Flags: [Final|Native|Static|Public|BlueprintCallable|BlueprintPure]
-	static FString Conv_ObjectToString(UObject* InObj)
+    // Object: Function Engine.KismetStringLibrary.Conv_ObjectToString
+    // Flags: [Final|Native|Static|Public|BlueprintCallable|BlueprintPure]
+    static FString Conv_ObjectToString(UObject *InObj)
     {
         static UObject *Func = nullptr;
         if (!Func)
@@ -615,7 +614,7 @@ public:
 
         struct
         {
-            UObject* InObj;
+            UObject *InObj;
             FString ReturnValue;
         } Params = {InObj};
 
@@ -624,9 +623,9 @@ public:
         return Params.ReturnValue;
     }
 
-	// Object: Function Engine.KismetStringLibrary.Conv_NameToString
-	// Flags: [Final|Native|Static|Public|BlueprintCallable|BlueprintPure]
-	static FString Conv_NameToString(FName InName)
+    // Object: Function Engine.KismetStringLibrary.Conv_NameToString
+    // Flags: [Final|Native|Static|Public|BlueprintCallable|BlueprintPure]
+    static FString Conv_NameToString(FName InName)
     {
         static UObject *Func = nullptr;
         if (!Func)
@@ -655,9 +654,9 @@ public:
 class UKismetSystemLibrary : public UBlueprintFunctionLibrary
 {
 public:
-	// Object: Function Engine.KismetSystemLibrary.GetFrameCount
-	// Flags: [Final|Native|Static|Public|BlueprintCallable|BlueprintPure]
-	static int64_t GetFrameCount()
+    // Object: Function Engine.KismetSystemLibrary.GetFrameCount
+    // Flags: [Final|Native|Static|Public|BlueprintCallable|BlueprintPure]
+    static int64_t GetFrameCount()
     {
         static UObject *Func = nullptr;
         if (!Func)
@@ -673,9 +672,9 @@ public:
         return Params.ReturnValue;
     }
 
-	// Object: Function Engine.KismetSystemLibrary.GetEngineVersion
-	// Flags: [Final|Native|Static|Public|BlueprintCallable|BlueprintPure]
-	static FString GetEngineVersion()
+    // Object: Function Engine.KismetSystemLibrary.GetEngineVersion
+    // Flags: [Final|Native|Static|Public|BlueprintCallable|BlueprintPure]
+    static FString GetEngineVersion()
     {
         static UObject *Func = nullptr;
         if (!Func)
@@ -692,7 +691,7 @@ public:
     }
 
     // Function  /Script/Engine.KismetSystemLibrary.GetDisplayName
-	// Flags: [Final|Native|Static|Public|BlueprintCallable|BlueprintPure]
+    // Flags: [Final|Native|Static|Public|BlueprintCallable|BlueprintPure]
     static FString GetDisplayName(UObject *Object)
     {
         static UObject *Func = nullptr;
@@ -740,19 +739,19 @@ public:
         return Params.ReturnValue;
     }
 
-	// Object: Function Engine.GameplayStatics.GetPlayerCameraManager
-	// Flags: [Final|Native|Static|Public|BlueprintCallable|BlueprintPure]
-	static APlayerCameraManager* GetPlayerCameraManager(UObject* WorldContextObject, int32_t PlayerIndex)
+    // Object: Function Engine.GameplayStatics.GetPlayerCameraManager
+    // Flags: [Final|Native|Static|Public|BlueprintCallable|BlueprintPure]
+    static APlayerCameraManager *GetPlayerCameraManager(UObject *WorldContextObject, int32_t PlayerIndex)
     {
-        static UObject* Func = nullptr;
+        static UObject *Func = nullptr;
         if (!Func)
             Func = UObject::StaticFindObject(u"/Script/Engine.GameplayStatics:GetPlayerCameraManager");
 
         struct
         {
-            UObject* WorldContextObject;
+            UObject *WorldContextObject;
             int32_t PlayerIndex;
-            APlayerCameraManager* ReturnValue;
+            APlayerCameraManager *ReturnValue;
         } Params = {WorldContextObject, PlayerIndex, nullptr};
 
         GetDefaultObj()->ProcessEvent(Func, &Params);
@@ -786,6 +785,5 @@ public:
         return reinterpret_cast<UGameplayStatics *>(Obj);
     }
 };
-
 
 #endif // CLASSES_H
