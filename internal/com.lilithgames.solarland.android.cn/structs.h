@@ -193,6 +193,12 @@ struct FRotator
     }
 };
 
+struct FNamePool
+{
+    char pad[0x40];
+    uint8_t* Blocks[8192];
+};
+
 struct FName
 {
     int32_t ComparisonIndex;
@@ -211,6 +217,16 @@ struct FLinearColor
     
     FLinearColor() : R(0), G(0), B(0), A(0) {}
     FLinearColor(float r, float g, float b, float a) : R(r), G(g), B(b), A(a) {}
+};
+
+struct BoneIndex
+{
+    int32_t NumBones = 0;
+    int32_t head, neck_01, spine_03, spine_02, spine_01, pelvis, root;
+    int32_t hand_l, lowerarm_l, upperarm_l, clavicle_l;
+    int32_t hand_r, lowerarm_r, upperarm_r, clavicle_r;
+    int32_t ball_l, foot_l, calf_l, thigh_l;
+    int32_t ball_r, foot_r, calf_r, thigh_r;
 };
 
 #endif // STRUCTS_H

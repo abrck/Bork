@@ -21,6 +21,27 @@ public:
         reinterpret_cast<Fn>(vtable[Offsets::ProcessEventIdx])(this, Function, Params);
     }
 
+    static std::string GetName(uint32_t Id)
+    {
+        uint32_t Block = Id >> 16;
+        uint16_t Offset = Id & 0xFFFF;
+
+        FNamePool* NamePool =
+            (FNamePool*)(Globals::libUE4 + Offsets::GName);
+
+        uint8_t* Entry =
+            NamePool->Blocks[Block] + Offset * 2;
+
+        uint16_t Header = *(uint16_t*)Entry;
+
+        int Len = Header >> 6;
+
+        if (Len <= 0 || Len > 250)
+            return "None";
+
+        return std::string((char*)(Entry + 2), Len);
+    }
+
     static UObject *StaticClass()
     {
         static UObject *Clazz = nullptr;
@@ -33,6 +54,25 @@ public:
 class AActor : public UObject
 {
 public:
+    // Object: Function Engine.Actor.GetDistanceTo
+	// Flags: [Final|Native|Public|BlueprintCallable|BlueprintPure|Const]
+	float GetDistanceTo(AActor* OtherActor)
+    {
+        static UObject *Func = nullptr;
+        if (!Func)
+            Func = StaticFindObject(u"/Script/Engine.Actor:GetDistanceTo");
+
+        struct
+        {
+            AActor* OtherActor;
+            float ReturnValue;
+        } Params = {OtherActor};
+
+        ProcessEvent(Func, &Params);
+
+        return Params.ReturnValue;
+    }
+
 };
 
 class APlayerState : public AActor
@@ -155,6 +195,27 @@ public:
 class AController : public AActor
 {
 public:
+	// Object: Function Engine.Controller.LineOfSightTo
+	// Flags: [Native|Public|HasDefaults|BlueprintCallable|BlueprintPure|Const]
+	bool LineOfSightTo(AActor* Other, FVector ViewPoint, bool bAlternateChecks)
+    {
+        static UObject *Func = nullptr;
+        if (!Func)
+            Func = UObject::StaticFindObject(u"/Script/Engine.Controller:LineOfSightTo");
+
+        struct
+        {
+            AActor* Other;
+            FVector ViewPoint;
+            bool bAlternateChecks;
+            bool ReturnValue;
+        } Params = {Other, ViewPoint, bAlternateChecks};
+
+        ProcessEvent(Func, &Params);
+
+        return Params.ReturnValue;
+    }
+
     // Object: Function Engine.Controller.K2_GetPawn
     // Flags: [Final|Native|Public|BlueprintCallable|BlueprintPure|Const]
     APawn *K2_GetPawn()
@@ -179,7 +240,7 @@ class APlayerController : public AController
 public:
 	// Object: Function Engine.PlayerController.ProjectWorldLocationToScreen
 	// Flags: [Final|Native|Public|HasOutParms|HasDefaults|BlueprintCallable|BlueprintPure|Const]
-    bool ProjectWorldLocationToScreen(FVector WorldLocation, FVector2D& ScreenLocation, bool bPlayerViewportRelative)
+    bool ProjectWorldLocationToScreen(FVector WorldLocation, FVector2D& ScreenLocation)
     {
         static UObject* Func = nullptr;
         if (!Func)
@@ -191,7 +252,7 @@ public:
             FVector2D ScreenLocation;
             bool bPlayerViewportRelative;
             bool ReturnValue;
-        } Params = {WorldLocation, {}, bPlayerViewportRelative};
+        } Params = {WorldLocation, {}, false};
 
         ProcessEvent(Func, &Params);
 
@@ -230,23 +291,6 @@ public:
 class USceneComponent : public UActorComponent
 {
 public:
-	// Object: Function Engine.SceneComponent.GetAllSocketNames
-	// Flags: [Final|Native|Public|BlueprintCallable|BlueprintPure|Const]
-	TArray<FName> GetAllSocketNames()
-    {
-        static UObject *Func = nullptr;
-        if (!Func)
-            Func = UObject::StaticFindObject(u"/Script/Engine.SceneComponent:GetAllSocketNames");
-
-        struct
-        {
-            TArray<FName> ReturnValue;
-        } Params;
-
-        ProcessEvent(Func, &Params);
-
-        return Params.ReturnValue;
-    }
 
 };
 
@@ -263,6 +307,43 @@ public:
 class USkinnedMeshComponent : public UMeshComponent
 {
 public:
+    // Object: Function Engine.SkinnedMeshComponent.GetBoneName
+	// Flags: [Final|Native|Public|BlueprintCallable|BlueprintPure|Const]
+	FName GetBoneName(int32_t BoneIndex)
+    {
+        static UObject* Func = nullptr;
+        if (!Func)
+            Func = UObject::StaticFindObject(u"/Script/Engine.SkinnedMeshComponent:GetBoneName");
+
+        struct
+        {
+            int32_t BoneIndex;
+            FName ReturnValue;
+        } Params = {BoneIndex};
+
+        ProcessEvent(Func, &Params);
+
+        return Params.ReturnValue;
+    }
+
+	// Object: Function Engine.SkinnedMeshComponent.GetNumBones
+	// Flags: [Final|Native|Public|BlueprintCallable|BlueprintPure|Const]
+	int32_t GetNumBones()
+    {
+        static UObject* Func = nullptr;
+        if (!Func)
+            Func = UObject::StaticFindObject(u"/Script/Engine.SkinnedMeshComponent:GetNumBones");
+
+        struct
+        {
+            int32_t ReturnValue;
+        } Params;
+
+        ProcessEvent(Func, &Params);
+
+        return Params.ReturnValue;
+    }
+
 	// Object: Function Engine.SkinnedMeshComponent.TransformFromBoneSpace
 	// Flags: [Final|Native|Public|HasOutParms|HasDefaults|BlueprintCallable]
     void TransformFromBoneSpace(FName BoneName, const FVector& InPosition, const FRotator& InRotation, FVector& OutPosition, FRotator& OutRotation)
@@ -291,6 +372,113 @@ public:
         FVector OutPos; FRotator OutRot;
         TransformFromBoneSpace(BoneName, FVector(), FRotator(), OutPos, OutRot);
         return OutPos;
+    }
+
+    BoneIndex* GetBoneIndex()
+    {
+        static std::unordered_map<int, std::unique_ptr<BoneIndex>> BoneIdxCache;
+        int Num = GetNumBones();
+        
+        auto it = BoneIdxCache.find(Num);
+        if (it != BoneIdxCache.end())
+            return it->second.get();
+
+        auto NewBoneIdx = std::make_unique<BoneIndex>();
+        NewBoneIdx->NumBones = Num;
+
+        for (int i = 0; i < Num; ++i)
+        {
+            int NameIdx = GetBoneName(i).ComparisonIndex;
+            std::string BoneName = UObject::GetName(NameIdx);
+
+            if (BoneName == "head") NewBoneIdx->head = NameIdx;
+            else if (BoneName == "neck_01") NewBoneIdx->neck_01 = NameIdx;
+            else if (BoneName == "spine_03") NewBoneIdx->spine_03 = NameIdx;
+            else if (BoneName == "spine_02") NewBoneIdx->spine_02 = NameIdx;
+            else if (BoneName == "spine_01") NewBoneIdx->spine_01 = NameIdx;
+            else if (BoneName == "pelvis") NewBoneIdx->pelvis = NameIdx;
+            else if (BoneName == "Root") NewBoneIdx->root = NameIdx;
+            else if (BoneName == "hand_l") NewBoneIdx->hand_l = NameIdx;
+            else if (BoneName == "lowerarm_l") NewBoneIdx->lowerarm_l = NameIdx;
+            else if (BoneName == "upperarm_l") NewBoneIdx->upperarm_l = NameIdx;
+            else if (BoneName == "clavicle_l") NewBoneIdx->clavicle_l = NameIdx;
+            else if (BoneName == "hand_r") NewBoneIdx->hand_r = NameIdx;
+            else if (BoneName == "lowerarm_r") NewBoneIdx->lowerarm_r = NameIdx;
+            else if (BoneName == "upperarm_r") NewBoneIdx->upperarm_r = NameIdx;
+            else if (BoneName == "clavicle_r") NewBoneIdx->clavicle_r = NameIdx;
+            else if (BoneName == "ball_l") NewBoneIdx->ball_l = NameIdx;
+            else if (BoneName == "foot_l") NewBoneIdx->foot_l = NameIdx;
+            else if (BoneName == "calf_l") NewBoneIdx->calf_l = NameIdx;
+            else if (BoneName == "thigh_l") NewBoneIdx->thigh_l = NameIdx;
+            else if (BoneName == "ball_r") NewBoneIdx->ball_r = NameIdx;
+            else if (BoneName == "foot_r") NewBoneIdx->foot_r = NameIdx;
+            else if (BoneName == "calf_r") NewBoneIdx->calf_r = NameIdx;
+            else if (BoneName == "thigh_r") NewBoneIdx->thigh_r = NameIdx;
+        }
+
+        BoneIndex* result = NewBoneIdx.get();
+        BoneIdxCache.emplace(Num, std::move(NewBoneIdx));
+        return result;
+    }
+
+    bool GetBoxCoords(ASolarPlayerController *MyController, FVector* Coords)
+    {
+        BoneIndex* BoneIdx = GetBoneIndex();
+
+        FVector BoneList[] = {
+            GetBoneLocation(BoneIdx->head),
+            GetBoneLocation(BoneIdx->neck_01),
+            GetBoneLocation(BoneIdx->spine_03),
+            GetBoneLocation(BoneIdx->spine_02),
+            GetBoneLocation(BoneIdx->spine_01),
+            GetBoneLocation(BoneIdx->pelvis),
+            GetBoneLocation(BoneIdx->hand_l),
+            GetBoneLocation(BoneIdx->lowerarm_l),
+            GetBoneLocation(BoneIdx->upperarm_l),
+            GetBoneLocation(BoneIdx->clavicle_l),
+            GetBoneLocation(BoneIdx->hand_r),
+            GetBoneLocation(BoneIdx->lowerarm_r),
+            GetBoneLocation(BoneIdx->upperarm_r),
+            GetBoneLocation(BoneIdx->clavicle_r),
+            GetBoneLocation(BoneIdx->ball_l),
+            GetBoneLocation(BoneIdx->foot_l),
+            GetBoneLocation(BoneIdx->calf_l),
+            GetBoneLocation(BoneIdx->thigh_l),
+            GetBoneLocation(BoneIdx->ball_r),
+            GetBoneLocation(BoneIdx->foot_r),
+            GetBoneLocation(BoneIdx->calf_r),
+            GetBoneLocation(BoneIdx->thigh_r)
+        };
+
+        float MinX = FLT_MAX, MinY = FLT_MAX;
+        float MaxX = -FLT_MAX, MaxY = -FLT_MAX;
+
+        bool Found = false;
+
+        for (int i = 0; i < sizeof(BoneList) / sizeof(FVector); i++)
+        {
+            FVector Screen;
+            if (!MyController->ProjectWorldLocationToScreen(BoneList[i], Screen))
+                continue;
+
+            Found = true;
+
+            if (Screen.X < MinX) MinX = Screen.X;
+            if (Screen.X > MaxX) MaxX = Screen.X;
+            if (Screen.Y < MinY) MinY = Screen.Y;
+            if (Screen.Y > MaxY) MaxY = Screen.Y;
+        }
+
+        if (!Found)
+            return false;
+
+        float PaddingX = (MaxX - MinX) * 0.1f;
+        float PaddingY = (MaxY - MinY) * 0.1f;
+
+        Coords[0] = FVector(MinX - PaddingX, MinY - PaddingY, 0);  // 左上角
+        Coords[1] = FVector(MaxX + PaddingX, MaxY + PaddingY, 0);  // 右下角
+
+        return true;
     }
 };
 

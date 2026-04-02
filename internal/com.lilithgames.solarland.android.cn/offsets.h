@@ -4,6 +4,7 @@
 namespace Offsets
 {
     inline uintptr_t GEngine                     = 0xCD19010;
+    inline uintptr_t GName                       = 0xCB71480;
     inline uintptr_t StaticFindObject            = 0x852CAF4;
     inline uintptr_t ProcessEventIdx             = 0x44;
     inline uintptr_t DrawTransitionIdx           = 0x82;
