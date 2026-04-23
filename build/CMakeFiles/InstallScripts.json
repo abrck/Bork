@@ -1,9 +1,0 @@
-{
-	"InstallScripts" : 
-	[
-		"C:/Users/User/Desktop/Bork/build/cmake_install.cmake",
-		"C:/Users/User/Desktop/Bork/build/internal/cmake_install.cmake",
-		"C:/Users/User/Desktop/Bork/build/internal/com.lilithgames.solarland.android.cn/cmake_install.cmake"
-	],
-	"Parallel" : false
-}
