@@ -1,6 +1,7 @@
 add_library(Solarland SHARED
     entry.cpp
     aimass.cpp
+    And64InlineHook.cpp
 )
 
 target_include_directories(Solarland PRIVATE

@@ -1,0 +1,7 @@
+C:/Users/User/Desktop/Bork/build/CMakeFiles/edit_cache.dir
+C:/Users/User/Desktop/Bork/build/CMakeFiles/rebuild_cache.dir
+C:/Users/User/Desktop/Bork/build/internal/CMakeFiles/edit_cache.dir
+C:/Users/User/Desktop/Bork/build/internal/CMakeFiles/rebuild_cache.dir
+C:/Users/User/Desktop/Bork/build/internal/com.lilithgames.solarland.android.cn/CMakeFiles/Solarland.dir
+C:/Users/User/Desktop/Bork/build/internal/com.lilithgames.solarland.android.cn/CMakeFiles/edit_cache.dir
+C:/Users/User/Desktop/Bork/build/internal/com.lilithgames.solarland.android.cn/CMakeFiles/rebuild_cache.dir

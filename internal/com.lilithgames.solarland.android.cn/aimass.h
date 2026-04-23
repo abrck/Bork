@@ -14,4 +14,5 @@ namespace AimAss
     FVector2D GetAimScreenPos();
 
     void MemoryAimbot(float Smooth);
+    FVector GetAimPredictedPos(const FPlayerVirtualBulletSpawnParameter& Param);
 }

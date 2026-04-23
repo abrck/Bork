@@ -73,6 +73,22 @@ namespace AimAss
         return AimPos;
     }
 
+    FVector GetAimPredictedPos(const FPlayerVirtualBulletSpawnParameter& Param)
+    {
+        FVector CameraLocation = GameData::MyCameraManager->GetCameraLocation();
+        FVector juli, yupan;
+        juli.X = (AimPos.X - CameraLocation.X) / 100;
+        juli.Y = (AimPos.Y - CameraLocation.Y) / 100;
+        juli.Z = (AimPos.Z - CameraLocation.Z) / 100;
+        float yupanjuli = sqrt(juli.X * juli.X + juli.Y * juli.Y + juli.Z * juli.Z);
+        float flytime = yupanjuli / 1000;
+        flytime = flytime / 1.2;
+        yupan.X = AimPos.X + Enemy->GetVelocity().X * flytime;
+        yupan.Y = AimPos.Y + Enemy->GetVelocity().Y * flytime;
+        yupan.Z = AimPos.Z + 5.0 + pow(flytime, 2) * 40;
+        return yupan;
+    }
+
     FVector2D GetAimScreenPos()
     {
         return AimPosSc;
@@ -90,4 +106,5 @@ namespace AimAss
         GameData::MyController->AddPitchInput(-DeltaRot.Pitch * Smooth);
         GameData::MyController->AddYawInput(DeltaRot.Yaw * Smooth);
     }
+
 }

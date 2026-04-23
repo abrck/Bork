@@ -4,7 +4,6 @@
 #include "engine.h"
 #include "aimass.h"
 
-
 static FLinearColor ColorWhite(1.0f, 1.0f, 1.0f, 1.0f);
 static FLinearColor ColorBlack(0.0f, 0.0f, 0.0f, 1.0f);
 static FLinearColor ColorRed(1.0f, 0.0f, 0.0f, 1.0f);
@@ -18,24 +17,56 @@ static FLinearColor ColorTransparent(0.0f, 0.0f, 0.0f, 0.0f);
 
 // ======================================================================================================
 
-FVector (*oGetShotDir)(void *thiz, bool NeedSpread);
-FVector hkGetShotDir(void *thiz, bool NeedSpread)
+struct FHitResult
 {
-    LOGI("GetShotDir called: %p (thiz: %p, NeedSpread=%d)", (uintptr_t)__builtin_return_address(0) - Globals::libUE4 - 4, thiz, NeedSpread);
-    return oGetShotDir(thiz, false);
-}
+    uint8_t bBlockingHit : 1;      // 0x0 - 是否阻挡命中
+    uint8_t bStartPenetrating : 1; // 0x0 - 是否开始穿透
+    uint8_t BitPad : 6;            // 0x0 - 位填充
+    uint8_t Pad_0x1[0x3];          // 0x1(0x3) - 占位符
+    int32_t FaceIndex;             // 0x4(0x4) - 面索引
+    float Time;                    // 0x8(0x4) - 命中时间（0-1）
+    float Distance;                // 0xC(0x4) - 命中距离
+    FVector Location;              // 0x10(0xC) - 命中位置
+    FVector ImpactPoint;           // 0x1C(0xC) - 撞击点
+    FVector Normal;                // 0x28(0xC) - 法线
+    FVector ImpactNormal;          // 0x34(0xC) - 撞击法线
+    FVector TraceStart;            // 0x40(0xC) - 射线起点
+    FVector TraceEnd;              // 0x4C(0xC) - 射线终点
+    float PenetrationDepth;        // 0x58(0x4) - 穿透深度
+    int32_t Item;                  // 0x5C(0x4) - 物品索引
+    void *PhysMaterial;            // 0x60(0x8) - 物理材质（占位）
+    void *Actor;                   // 0x68(0x8) - 命中的Actor
+    void *Component;               // 0x70(0x8) - 命中的组件（占位）
+    uint64_t BoneName;             // 0x78(0x8) - 骨骼名称（占位）
+    uint64_t MyBoneName;           // 0x80(0x8) - 我的骨骼名称（占位）
+};
 
-FVector (*oGetShootingTraceStartLocation)(void *thiz);
-FVector hkGetShootingTraceStartLocation(void *thiz)
+void (*oSub74D98C4)(ASolarWeapon *Weapon, FPlayerVirtualBulletSpawnParameter *OutBulletParam, FVector *OutStart, FVector *OutEnd, void *a5);
+void hkSub74D98C4(ASolarWeapon *Weapon, FPlayerVirtualBulletSpawnParameter *OutBulletParam, FVector *OutStart, FVector *OutEnd, void *a5)
 {
-    LOGI("GetShootingTraceStartLocation called: %p (thiz: %p)", (uintptr_t)__builtin_return_address(0) - Globals::libUE4 - 4, thiz);
-    return oGetShootingTraceStartLocation(thiz);
+
+    if (AimAss::CanAim() && OutStart && OutEnd)
+    {
+        ASolarCharacter *Target = AimAss::GetTarget();
+        if (Target)
+        {
+            FVector AimPos = AimAss::GetAimPredictedPos(*OutBulletParam);
+            *OutStart = AimPos;
+            *OutEnd = AimPos;
+        }
+    }
+
+    oSub74D98C4(Weapon, OutBulletParam, OutStart, OutEnd, a5);
 }
 
 void (*oDrawTransition)(void *GameViewport, UCanvas *Canvas) = nullptr;
 void hkDrawTransition(void *GameViewport, UCanvas *Canvas)
 {
     oDrawTransition(GameViewport, Canvas);
+
+    std::string QQText = "QQ: 3483048792\nt.me/aoprtt\n我是免费的";
+    Canvas->K2_DrawText(GameData::GEngine->GetTinyFont(), 20, FString::FromAnsi(QQText.c_str()), FVector2D(Canvas->GetSize().X / 4, Canvas->GetSize().Y / 14), ColorWhite, true, true, true, ColorBlack);
+
 
     GameData::World = *(UWorld **)((uintptr_t)GameData::GameViewport + Offsets::World);
     if (IsBadPtr(GameData::World))
@@ -63,10 +94,10 @@ void hkDrawTransition(void *GameViewport, UCanvas *Canvas)
         return;
     // LOGI("MyCameraManager: %p", GameData::MyCameraManager);
 
-    ASolarPlayerWeapon* CurrentWeapon = GameData::MyPawn->GetCurrentWeapon();
+    ASolarPlayerWeapon *CurrentWeapon = GameData::MyPawn->GetCurrentWeapon();
     if (!IsBadPtr(CurrentWeapon))
     {
-        LOGI("CurrentWeapon: %p", CurrentWeapon);
+        // LOGI("CurrentWeapon: %p", CurrentWeapon);
 
         // void **VTable = *(void ***)(CurrentWeapon);
         // if (VTable[0x101] != (void *)hkGetShotDir)
@@ -77,6 +108,34 @@ void hkDrawTransition(void *GameViewport, UCanvas *Canvas)
         // if (VTable[0x110] != (void *)hkGetShootingTraceStartLocation)
         // {
         //     JumpVirtualHook(VTable, 0x110, (void *)hkGetShootingTraceStartLocation, (void **)&oGetShootingTraceStartLocation);
+        // }
+    }
+
+    // UWeaponSystemPlayerBase* WeaponSystemComponent; // 0x3E58(0x8)
+
+    void *WeaponSystemComponent = *(void **)((uintptr_t)GameData::MyPawn + 0x3E58);
+    if (!IsBadPtr(WeaponSystemComponent))
+    {
+        // LOGI("WeaponSystemComponent: %p", WeaponSystemComponent);
+
+        // void** VTable = *(void ***)(WeaponSystemComponent);
+        // if (VTable[0x8A] != (void *)hkClientVirtualBulletShot)
+        // {
+        //     JumpVirtualHook(VTable, 0x8A, (void *)hkClientVirtualBulletShot, (void **)&oClientVirtualBulletShot);
+        //     LOGI("Hook ClientVirtualBulletShot: %p (%p)", (uintptr_t)VTable[0x8A], (uintptr_t)VTable[0x8A] - Globals::libUE4);
+        // }
+
+        // void** VTable = *(void ***)(WeaponSystemComponent);
+        // if (VTable[0xB7] != (void *)hkClientPlayerVirtualBulletShot)
+        // {
+        //     JumpVirtualHook(VTable, 0xB7, (void *)hkClientPlayerVirtualBulletShot, (void **)&oClientPlayerVirtualBulletShot);LOGI("Hooked ClientPlayerVirtualBulletShot at VTable[0xB7]");
+        //     LOGI("Hooked ClientPlayerVirtualBulletShot: %p (%p)", (uintptr_t)VTable[0xB7], (uintptr_t)VTable[0xB7] - Globals::libUE4);
+        // }
+
+        // if (VTable[0xB9] != (void *)hkServerPlayerVirtualBulletShot)
+        // {
+        //     JumpVirtualHook(VTable, 0xB9, (void *)hkServerPlayerVirtualBulletShot, (void **)&oServerPlayerVirtualBulletShot);
+        //     LOGI("Hooked ServerPlayerVirtualBulletShot: %p (%p)", (uintptr_t)VTable[0xB9], (uintptr_t)VTable[0xB9] - Globals::libUE4);
         // }
     }
 
@@ -98,17 +157,20 @@ void hkDrawTransition(void *GameViewport, UCanvas *Canvas)
         if (IsBadPtr(PlayerState))
             continue;
 
-        const char *PlayerName = "Bot";
-        bool IsBot = PlayerState->IsAIPlayer();
+        // if (PlayerState->GetTeamID() == GameData::MyPawn->GetSolarPlayerState()->GetTeamID())
+        //     continue;
+
+        bool IsBot = !PlayerState->GetPlayerName().IsValid();
+        const char *PlayerName = PlayerState->GetPlayerName().ToString();
 
         if (IsBot)
         {
             RoBotCount++;
+            PlayerName = "Bot";
         }
         else
         {
             PlayerCount++;
-            PlayerName = PlayerState->GetPlayerName().ToString();
         }
 
         float Distance = Player->GetDistanceTo((AActor *)GameData::MyPawn);
@@ -449,13 +511,12 @@ void hkDrawTransition(void *GameViewport, UCanvas *Canvas)
         Canvas->K2_DrawLine(FVector2D(Canvas->GetSize().X / 2, Canvas->GetSize().Y / 2), AimAss::GetAimScreenPos(), 1.0f, ColorWhite);
         if (GameData::MyPawn->IsAiming())
         {
-            AimAss::MemoryAimbot(0.10f);
+            // AimAss::MemoryAimbot(0.10f);
         }
     }
 
     // 绘制追踪圈
     Canvas->K2_DrawCircle(FVector2D(Canvas->GetSize().X / 2, Canvas->GetSize().Y / 2), 300, 1.5f, ColorWhite, 12);
-
 
     // 人数显示
     std::string TotalCount = "P:" + std::to_string((int)PlayerCount) + " " + "R:" + std::to_string((int)RoBotCount);

@@ -7,6 +7,8 @@
 #include <unistd.h>
 #include <cfloat>
 #include <algorithm>
+#include <vector>
+#include <cstring>
 
 template <typename T>
 struct TArray
@@ -28,25 +30,83 @@ struct FString
     int32_t Num() const { return Data.Count; }
     int32_t Len() const { return Data.Count > 0 ? Data.Count - 1 : 0; }
 
-    static FString FromAnsi(const char *str)
+    bool IsValid() const
+    {
+        return Data.Data != nullptr;
+    }
+
+    static FString FromAnsi(const char* str)
     {
         FString result;
+
         if (!str)
             return result;
 
-        int len = 0;
-        while (str[len])
-            len++;
+        const unsigned char* s = (const unsigned char*)str;
 
-        result.Data.Data = new char16_t[len + 1];
-        result.Data.Count = len + 1;
-        result.Data.Max = len + 1;
+        std::vector<char16_t> utf16;
+        utf16.reserve(strlen(str) + 1); // 预留空间
 
-        for (int i = 0; i < len; i++)
+        while (*s)
         {
-            result.Data.Data[i] = static_cast<char16_t>(str[i]);
+            uint32_t codepoint = 0;
+
+            if (*s <= 0x7F)
+            {
+                // 1 byte
+                codepoint = *s++;
+            }
+            else if ((*s >> 5) == 0x6)
+            {
+                // 2 bytes
+                codepoint = ((*s & 0x1F) << 6) |
+                            (s[1] & 0x3F);
+                s += 2;
+            }
+            else if ((*s >> 4) == 0xE)
+            {
+                // 3 bytes
+                codepoint = ((*s & 0x0F) << 12) |
+                            ((s[1] & 0x3F) << 6) |
+                            (s[2] & 0x3F);
+                s += 3;
+            }
+            else if ((*s >> 3) == 0x1E)
+            {
+                // 4 bytes
+                codepoint = ((*s & 0x07) << 18) |
+                            ((s[1] & 0x3F) << 12) |
+                            ((s[2] & 0x3F) << 6) |
+                            (s[3] & 0x3F);
+                s += 4;
+            }
+            else
+            {
+                // 非法字符，跳过
+                ++s;
+                continue;
+            }
+
+            if (codepoint <= 0xFFFF)
+            {
+                utf16.push_back((char16_t)codepoint);
+            }
+            else
+            {
+                // surrogate pair
+                codepoint -= 0x10000;
+                utf16.push_back((char16_t)((codepoint >> 10) + 0xD800));
+                utf16.push_back((char16_t)((codepoint & 0x3FF) + 0xDC00));
+            }
         }
-        result.Data.Data[len] = u'\0';
+
+        utf16.push_back(u'\0');
+
+        // 填充到 TArray
+        result.Data.Count = (int32_t)utf16.size();
+        result.Data.Data = new char16_t[result.Data.Count];
+        memcpy(result.Data.Data, utf16.data(),
+            result.Data.Count * sizeof(char16_t));
 
         return result;
     }
@@ -60,7 +120,8 @@ struct FString
         if (len > 0 && Data.Data[len - 1] == u'\0')
             --len;
 
-        std::string out;
+        static std::string out;
+        out.clear();
         out.reserve(len);
 
         for (int i = 0; i < len; ++i)
@@ -229,6 +290,45 @@ struct BoneIndex
     int32_t hand_r, lowerarm_r, upperarm_r, clavicle_r;
     int32_t ball_l, foot_l, calf_l, thigh_l;
     int32_t ball_r, foot_r, calf_r, thigh_r;
+};
+
+struct FPlayerVirtualBulletSpawnParameter  // Size: 0xB4 (180 bytes)
+{
+    uint32_t FireUniqueID;              // 0x0
+    uint8_t ShotGunFireUniqueID;        // 0x4
+    uint8_t Pad_0x5[0x3];               // 0x5
+    float FireTimeStamp;                // 0x8
+    FVector AimStart;                   // 0xC
+    FVector AimDir;                     // 0x18
+    FVector CharacterLoc;               // 0x24
+    FVector StartLoc;                   // 0x30
+    FVector TargetLoc;                  // 0x3C
+    uint8_t Pad_0x48[0xC];              // 0x48
+    void* Target;                       // 0x54 (TWeakObjectPtr)
+    uint8_t Pad_0x5C[0x4];              // 0x5C
+    FVector HitTargetRelativeLocation;  // 0x5C
+    uint8_t bHasForceAimIgnore;         // 0x68
+    uint8_t bInputAdjustRecoil;         // 0x69
+    bool bAutoLockTarget;               // 0x6A
+    uint8_t Pad_0x6B[0x1];              // 0x6B
+    FName AutoLockSocketName;           // 0x6C (FName = 8 bytes)
+    uint8_t CurveGroupIndex;            // 0x74
+    uint8_t CurveIndex;                 // 0x75
+    int16_t CurveDegree;                // 0x76
+    uint8_t bEnableCharge;              // 0x78
+    uint8_t Pad_0x79[0x3];              // 0x79
+    float ChargeTime;                   // 0x7C
+    int32_t ChargeStage;                // 0x80
+    uint8_t PreFireChargeLevel;         // 0x84
+    uint8_t bSubShootPattern;           // 0x85
+    uint8_t Pad_0x86[0x2];              // 0x86
+    uint32_t FireFrame;                 // 0x88
+    uint32_t FireInternalID;            // 0x8C
+    uint8_t IsScopeOpen;                // 0x90
+    uint8_t Pad_0x91[0x3];              // 0x91
+    float HorizontalVar;                // 0x94
+    float VerticalVar;                  // 0x98
+    uint8_t Pad_0x9C[0x18];             // 0x9C
 };
 
 #endif // STRUCTS_H

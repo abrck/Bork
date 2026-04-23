@@ -54,6 +54,24 @@ public:
 class AActor : public UObject
 {
 public:
+	// Object: Function Engine.Actor.GetVelocity
+	// Flags: [Native|Public|HasDefaults|BlueprintCallable|BlueprintPure|Const]
+	FVector GetVelocity()
+    {
+        static UObject *Func = nullptr;
+        if (!Func)
+            Func = StaticFindObject(u"/Script/Engine.Actor:GetVelocity");
+
+        struct
+        {
+            FVector ReturnValue;
+        } Params;
+
+        ProcessEvent(Func, &Params);
+
+        return Params.ReturnValue;
+    }
+
     // Object: Function Engine.Actor.GetDistanceTo
     // Flags: [Final|Native|Public|BlueprintCallable|BlueprintPure|Const]
     float GetDistanceTo(AActor *OtherActor)
@@ -77,13 +95,13 @@ public:
 class APlayerState : public AActor
 {
 public:
-    // Object: Function Engine.PlayerState.GetPlayerName
-    // Flags: [Final|Native|Public|BlueprintCallable|BlueprintPure|Const]
-    FString GetPlayerName()
+	// Object: Function Engine.PlayerState.GetPlayerName
+	// Flags: [Final|Native|Public|BlueprintCallable|BlueprintPure|Const]
+	FString GetPlayerName()
     {
         static UObject *Func = nullptr;
         if (!Func)
-            Func = UObject::StaticFindObject(u"/Script/Engine.PlayerState:GetPlayerName");
+            Func = StaticFindObject(u"/Script/Engine.PlayerState:GetPlayerName");
 
         struct
         {
@@ -104,13 +122,49 @@ public:
 class ASolarPlayerState : public AModularPlayerState
 {
 public:
-    // Object: Function Solarland.SolarPlayerState.IsAIPlayer
-    // Flags: [Native|Public|BlueprintCallable|BlueprintPure|Const]
-    bool IsAIPlayer()
+	// Object: Function Solarland.SolarPlayerState.GetPlayerNameWithoutUID
+	// Flags: [Native|Public|BlueprintCallable|BlueprintPure|Const]
+	FString GetPlayerNameWithoutUID()
     {
         static UObject *Func = nullptr;
         if (!Func)
-            Func = UObject::StaticFindObject(u"/Script/Solarland.SolarPlayerState:IsAIPlayer");
+            Func = StaticFindObject(u"/Script/Solarland.SolarPlayerState:GetPlayerNameWithoutUID");
+
+        struct
+        {
+            FString ReturnValue;
+        } Params;
+
+        ProcessEvent(Func, &Params);
+
+        return Params.ReturnValue;
+    }
+
+	// Object: Function Solarland.SolarPlayerState.GetTeamID
+	// Flags: [Final|RequiredAPI|Native|Public|BlueprintCallable|BlueprintPure|Const]
+	uint8_t GetTeamID()
+    {
+        static UObject *Func = nullptr;
+        if (!Func)
+            Func = StaticFindObject(u"/Script/Solarland.SolarPlayerState:GetTeamID");
+
+        struct
+        {
+            uint8_t ReturnValue;
+        } Params;
+
+        ProcessEvent(Func, &Params);
+
+        return Params.ReturnValue;
+    }
+    
+	// Object: Function Solarland.SolarPlayerState.IsPlayer
+	// Flags: [Native|Public|BlueprintCallable|BlueprintPure|Const]
+	bool IsPlayer()
+    {
+        static UObject *Func = nullptr;
+        if (!Func)
+            Func = StaticFindObject(u"/Script/Solarland.SolarPlayerState:IsPlayer");
 
         struct
         {
@@ -136,6 +190,7 @@ public:
 class APawn : public AActor
 {
 public:
+
 };
 
 class ACharacter : public APawn
@@ -887,7 +942,7 @@ class UKismetMathLibrary : public UBlueprintFunctionLibrary
 public:
 	// Object: Function Engine.KismetMathLibrary.FindLookAtRotation
 	// Flags: [Final|Native|Static|Public|HasOutParms|HasDefaults|BlueprintCallable|BlueprintPure]
-	static FRotator FindLookAtRotation(FVector& Start, FVector& Target)
+	static FRotator FindLookAtRotation(FVector Start, FVector Target)
     {
         static UObject *Func = nullptr;
         if (!Func)
